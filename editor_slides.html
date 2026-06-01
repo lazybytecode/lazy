@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Slide Engine Pro</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"/>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gifshot@0.4.5/build/gifshot.min.js"></script>
+
+<style>
+
+/* ===================================================
+   RESET
+=================================================== */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:Segoe UI,sans-serif;
+  background:#020617;
+  color:#fff;
+  overflow:hidden;
+}
+
+/* ===================================================
+   APP
+=================================================== */
+
+.app{
+  display:flex;
+  width:100%;
+  height:100vh;
+}
+
+/* ===================================================
+   SIDEBAR
+=================================================== */
+
+.sidebar{
+  width:300px;
+  background:#0f172a;
+  border-right:1px solid #1e293b;
+  padding:20px;
+  overflow:auto;
+}
+
+.logo{
+  font-size:32px;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+.sidebar button{
+  width:100%;
+  height:48px;
+  border:none;
+  background:#1e293b;
+  color:#fff;
+  border-radius:12px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.sidebar button:hover{
+  background:#334155;
+}
+
+.sidebar hr{
+  border:none;
+  border-top:1px solid #1e293b;
+  margin:20px 0;
+}
+
+.slide-item{
+  background:#1e293b;
+  padding:14px;
+  border-radius:12px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.slide-item:hover{
+  background:#334155;
+}
+
+.slide-item.active{
+  border:2px solid #60a5fa;
+}
+
+/* ===================================================
+   EDITOR
+=================================================== */
+
+.editor{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.toolbar{
+  height:90px;
+  background:#0f172a;
+  border-bottom:1px solid #1e293b;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:20px;
+}
+
+.toolbar input,
+.toolbar select{
+  height:45px;
+  border:none;
+  background:#1e293b;
+  color:#fff;
+  border-radius:12px;
+  padding:0 14px;
+}
+
+.toolbar input{
+  flex:1;
+}
+
+/* ===================================================
+   CANVAS
+=================================================== */
+
+.canvas-wrapper{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:auto;
+  padding:40px;
+}
+
+#slide-canvas{
+  width:1280px;
+  height:720px;
+  background:
+  linear-gradient(135deg,#020617,#0f172a);
+  border-radius:24px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:0 10px 50px rgba(0,0,0,.5);
+}
+
+/* ===================================================
+   SLIDE BASE
+=================================================== */
+
+.slide{
+  width:100%;
+  height:100%;
+  padding:60px;
+}
+
+/* ===================================================
+   CAPA
+=================================================== */
+
+.hero{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:40px;
+  height:100%;
+}
+
+.hero-content{
+  flex:1;
+}
+
+.hero-title{
+  font-size:72px;
+  margin-bottom:20px;
+}
+
+.hero-subtitle{
+  font-size:28px;
+  color:#94a3b8;
+}
+
+.hero-image{
+  width:40%;
+  border-radius:24px;
+}
+
+/* ===================================================
+   FEATURES
+=================================================== */
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.card{
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  padding:30px;
+}
+
+.card h2{
+  margin-bottom:20px;
+}
+
+.card ul{
+  list-style:none;
+}
+
+.card li{
+  margin-bottom:10px;
+  color:#cbd5e1;
+}
+
+/* ===================================================
+   IMAGE
+=================================================== */
+
+.full-image{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar">
+
+    <div class="logo">
+      Slide Engine
+    </div>
+
+    <button onclick="novoSlide()">
+      + Novo Slide
+    </button>
+
+    <button onclick="duplicarSlide()">
+      Duplicar Slide
+    </button>
+
+    <button onclick="removerSlide()">
+      Remover Slide
+    </button>
+
+    <hr>
+
+    <button onclick="salvarMarkdown()">
+      Salvar .MD
+    </button>
+
+    <button onclick="abrirMarkdown()">
+      Abrir .MD
+    </button>
+
+    <input
+    type="file"
+    id="abrir-md"
+    accept=".md"
+    hidden
+    onchange="carregarMarkdown(event)"
+    >
+
+    <hr>
+
+    <button onclick="exportarPNG()">
+      Exportar PNG
+    </button>
+
+    <button onclick="exportarPDF()">
+      Exportar PDF
+    </button>
+
+    <button onclick="exportarGIF()">
+      Exportar GIF
+    </button>
+
+    <hr>
+
+    <div id="slides-list"></div>
+
+  </aside>
+
+  <!-- EDITOR -->
+
+  <main class="editor">
+
+    <div class="toolbar">
+
+      <select
+      id="slide-type"
+      onchange="trocarLayout()"
+      >
+        <option value="capa">Capa</option>
+        <option value="features">Features</option>
+        <option value="imagem">Imagem</option>
+      </select>
+
+      <input
+      id="titulo"
+      placeholder="Título"
+      oninput="atualizarSlide()"
+      >
+
+      <input
+      id="subtitulo"
+      placeholder="Subtítulo"
+      oninput="atualizarSlide()"
+      >
+
+      <input
+      id="imagem"
+      placeholder="Imagem URL"
+      oninput="atualizarSlide()"
+      >
+
+    </div>
+
+    <div class="canvas-wrapper">
+
+      <div id="slide-canvas"></div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+
+/* ===================================================
+   STATE
+=================================================== */
+
+let slides = [
+
+  {
+    tipo:'capa',
+    titulo:'Meu SaaS',
+    subtitulo:'Plataforma inteligente',
+    imagem:'https://picsum.photos/600/600'
+  }
+
+];
+
+let slideAtual = 0;
+
+/* ===================================================
+   LAYOUTS
+=================================================== */
+
+const layouts = {
+
+  capa:renderCapa,
+  features:renderFeatures,
+  imagem:renderImagem
+
+};
+
+/* ===================================================
+   RENDER CAPA
+=================================================== */
+
+function renderCapa(slide){
+
+  return `
+  <section class="slide">
+
+    <div class="hero">
+
+      <div class="hero-content">
+
+        <h1 class="hero-title">
+          ${slide.titulo || ''}
+        </h1>
+
+        <p class="hero-subtitle">
+          ${slide.subtitulo || ''}
+        </p>
+
+      </div>
+
+      ${
+        slide.imagem
+        ? `
+        <img
+        src="${slide.imagem}"
+        class="hero-image">
+        `
+        : ''
+      }
+
+    </div>
+
+  </section>
+  `;
+
+}
+
+/* ===================================================
+   FEATURES
+=================================================== */
+
+function renderFeatures(slide){
+
+  return `
+  <section class="slide">
+
+    <h1 class="hero-title">
+      ${slide.titulo || ''}
+    </h1>
+
+    <p class="hero-subtitle">
+      ${slide.subtitulo || ''}
+    </p>
+
+    <br><br>
+
+    <div class="grid">
+
+      <div class="card">
+
+        <h2>Problemas</h2>
+
+        <ul>
+
+          ${(slide.problema || [])
+            .map(i=>`<li>${i}</li>`)
+            .join('')}
+
+        </ul>
+
+      </div>
+
+      <div class="card">
+
+        <h2>Soluções</h2>
+
+        <ul>
+
+          ${(slide.solucao || [])
+            .map(i=>`<li>${i}</li>`)
+            .join('')}
+
+        </ul>
+
+      </div>
+
+    </div>
+
+  </section>
+  `;
+
+}
+
+/* ===================================================
+   IMAGE
+=================================================== */
+
+function renderImagem(slide){
+
+  return `
+  <section class="slide">
+
+    <img
+    src="${slide.imagem}"
+    class="full-image">
+
+  </section>
+  `;
+
+}
+
+/* ===================================================
+   RENDER
+=================================================== */
+
+function renderSlide(){
+
+  const slide = slides[slideAtual];
+
+  document
+  .getElementById('slide-canvas')
+  .innerHTML = layouts[slide.tipo](slide);
+
+}
+
+/* ===================================================
+   LIST
+=================================================== */
+
+function renderSlidesList(){
+
+  const list =
+  document.getElementById('slides-list');
+
+  list.innerHTML = '';
+
+  slides.forEach((slide,index)=>{
+
+    const div = document.createElement('div');
+
+    div.className =
+    `slide-item ${
+      index === slideAtual
+      ? 'active'
+      : ''
+    }`;
+
+    div.innerHTML =
+    `${index+1}. ${slide.titulo}`;
+
+    div.onclick = ()=>{
+
+      slideAtual = index;
+
+      preencherCampos();
+      renderSlide();
+      renderSlidesList();
+
+    };
+
+    list.appendChild(div);
+
+  });
+
+}
+
+/* ===================================================
+   INPUTS
+=================================================== */
+
+function preencherCampos(){
+
+  const slide = slides[slideAtual];
+
+  document
+  .getElementById('slide-type')
+  .value = slide.tipo;
+
+  document
+  .getElementById('titulo')
+  .value = slide.titulo || '';
+
+  document
+  .getElementById('subtitulo')
+  .value = slide.subtitulo || '';
+
+  document
+  .getElementById('imagem')
+  .value = slide.imagem || '';
+
+}
+
+/* ===================================================
+   UPDATE
+=================================================== */
+
+function atualizarSlide(){
+
+  const slide = slides[slideAtual];
+
+  slide.titulo =
+  document.getElementById('titulo').value;
+
+  slide.subtitulo =
+  document.getElementById('subtitulo').value;
+
+  slide.imagem =
+  document.getElementById('imagem').value;
+
+  renderSlide();
+  renderSlidesList();
+
+}
+
+/* ===================================================
+   LAYOUT
+=================================================== */
+
+function trocarLayout(){
+
+  slides[slideAtual].tipo =
+  document.getElementById('slide-type').value;
+
+  renderSlide();
+
+}
+
+/* ===================================================
+   CRUD
+=================================================== */
+
+function novoSlide(){
+
+  slides.push({
+
+    tipo:'capa',
+    titulo:'Novo Slide',
+    subtitulo:'Descrição',
+    imagem:''
+
+  });
+
+  slideAtual = slides.length - 1;
+
+  renderSlidesList();
+  preencherCampos();
+  renderSlide();
+
+}
+
+function duplicarSlide(){
+
+  const clone =
+  JSON.parse(
+    JSON.stringify(slides[slideAtual])
+  );
+
+  slides.splice(slideAtual+1,0,clone);
+
+  slideAtual++;
+
+  renderSlidesList();
+  preencherCampos();
+  renderSlide();
+
+}
+
+function removerSlide(){
+
+  if(slides.length === 1) return;
+
+  slides.splice(slideAtual,1);
+
+  slideAtual = 0;
+
+  renderSlidesList();
+  preencherCampos();
+  renderSlide();
+
+}
+
+/* ===================================================
+   MARKDOWN
+=================================================== */
+
+function gerarMarkdown(){
+
+  let md = '';
+
+  slides.forEach(slide=>{
+
+    md += `#slide:${slide.tipo}\n`;
+
+    Object.entries(slide).forEach(([key,val])=>{
+
+      if(key === 'tipo') return;
+
+      if(Array.isArray(val)){
+
+        md += `${key}:\n`;
+
+        val.forEach(item=>{
+          md += `- ${item}\n`;
+        });
+
+      }else{
+
+        md += `${key}: ${val}\n`;
+
+      }
+
+    });
+
+    md += '\n';
+
+  });
+
+  return md;
+
+}
+
+/* ===================================================
+   SALVAR .MD
+=================================================== */
+
+async function salvarMarkdown(){
+
+  const markdown = gerarMarkdown();
+
+  const blob = new Blob(
+    [markdown],
+    {type:'text/markdown'}
+  );
+
+  /* ==========================
+     FILE SYSTEM ACCESS API
+  ========================== */
+
+  if(window.showSaveFilePicker){
+
+    try{
+
+      const handle =
+      await window.showSaveFilePicker({
+
+        suggestedName:'slides.md',
+
+        types:[{
+          description:'Markdown',
+          accept:{
+            'text/markdown':['.md']
+          }
+        }]
+
+      });
+
+      const writable =
+      await handle.createWritable();
+
+      await writable.write(blob);
+
+      await writable.close();
+
+      alert('Arquivo salvo.');
+
+    }catch(err){
+
+      console.log(err);
+
+    }
+
+  }
+
+  /* ==========================
+     FALLBACK
+  ========================== */
+
+  else{
+
+    const url =
+    URL.createObjectURL(blob);
+
+    const a =
+    document.createElement('a');
+
+    a.href = url;
+
+    a.download = 'slides.md';
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+  }
+
+}
+
+/* ===================================================
+   OPEN MD
+=================================================== */
+
+function abrirMarkdown(){
+
+  document
+  .getElementById('abrir-md')
+  .click();
+
+}
+
+/* ===================================================
+   LOAD MD
+=================================================== */
+
+async function carregarMarkdown(event){
+
+  const file =
+  event.target.files[0];
+
+  if(!file) return;
+
+  const texto =
+  await file.text();
+
+  slides = parseSlides(texto);
+
+  slideAtual = 0;
+
+  renderSlidesList();
+  preencherCampos();
+  renderSlide();
+
+}
+
+/* ===================================================
+   PARSER
+=================================================== */
+
+function parseSlides(md){
+
+  const blocos =
+  md.split(/^#slide:/gm)
+  .filter(Boolean);
+
+  return blocos.map(bloco=>{
+
+    const linhas =
+    bloco.trim().split('\n');
+
+    const tipo =
+    linhas.shift().trim();
+
+    const slide = { tipo };
+
+    let chaveAtual = null;
+
+    linhas.forEach(linha=>{
+
+      if(!linha.trim()) return;
+
+      if(linha.includes(':')){
+
+        const [key,...rest] =
+        linha.split(':');
+
+        chaveAtual = key.trim();
+
+        const valor =
+        rest.join(':').trim();
+
+        if(valor){
+
+          slide[chaveAtual] = valor;
+
+        }else{
+
+          slide[chaveAtual] = [];
+
+        }
+
+      }
+
+      else if(linha.startsWith('- ')){
+
+        if(!Array.isArray(slide[chaveAtual])){
+
+          slide[chaveAtual] = [];
+
+        }
+
+        slide[chaveAtual].push(
+          linha.replace('- ','')
+        );
+
+      }
+
+    });
+
+    return slide;
+
+  });
+
+}
+
+/* ===================================================
+   EXPORT PNG
+=================================================== */
+
+async function exportarPNG(){
+
+  const canvas =
+  await html2canvas(
+    document.getElementById('slide-canvas'),
+    {scale:2}
+  );
+
+  const a =
+  document.createElement('a');
+
+  a.href = canvas.toDataURL();
+
+  a.download = `slide-${slideAtual+1}.png`;
+
+  a.click();
+
+}
+
+/* ===================================================
+   EXPORT PDF
+=================================================== */
+
+async function exportarPDF(){
+
+  const { jsPDF } = window.jspdf;
+
+  const pdf = new jsPDF({
+
+    orientation:'landscape',
+    unit:'px',
+    format:[1280,720]
+
+  });
+
+  for(let i=0;i<slides.length;i++){
+
+    slideAtual = i;
+
+    renderSlide();
+
+    await esperar(300);
+
+    const canvas =
+    await html2canvas(
+      document.getElementById('slide-canvas'),
+      {scale:2}
+    );
+
+    const img =
+    canvas.toDataURL('image/png');
+
+    if(i>0){
+
+      pdf.addPage();
+
+    }
+
+    pdf.addImage(
+      img,
+      'PNG',
+      0,
+      0,
+      1280,
+      720
+    );
+
+  }
+
+  pdf.save('slides.pdf');
+
+}
+
+/* ===================================================
+   EXPORT GIF
+=================================================== */
+
+async function exportarGIF(){
+
+  const imagens = [];
+
+  for(let i=0;i<slides.length;i++){
+
+    slideAtual = i;
+
+    renderSlide();
+
+    await esperar(300);
+
+    const canvas =
+    await html2canvas(
+      document.getElementById('slide-canvas')
+    );
+
+    imagens.push(
+      canvas.toDataURL('image/png')
+    );
+
+  }
+
+  gifshot.createGIF({
+
+    images: imagens,
+    interval:2
+
+  },function(obj){
+
+    if(!obj.error){
+
+      const a =
+      document.createElement('a');
+
+      a.href = obj.image;
+
+      a.download = 'slides.gif';
+
+      a.click();
+
+    }
+
+  });
+
+}
+
+/* ===================================================
+   UTILS
+=================================================== */
+
+function esperar(ms){
+
+  return new Promise(resolve=>{
+    setTimeout(resolve,ms);
+  });
+
+}
+
+/* ===================================================
+   INIT
+=================================================== */
+
+renderSlide();
+renderSlidesList();
+preencherCampos();
+
+</script>
+
+</body>
+</html>

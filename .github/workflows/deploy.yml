@@ -1,0 +1,39 @@
+name: 🚀 Deploy via FTP
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      # 🧼 Deploy LIMPO (develop)
+      - name: 🧼 FTP Deploy Limpo
+        if: github.ref_name == 'develop'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          protocol: ftps
+          port: 21
+          local-dir: ./app/
+          server-dir: /public_html/
+          state-name: .ftp-deploy-sync-state.json
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.github*
+            **/node_modules/**
+            **/.env
+            **/*.log
+            README.md 
+            **/_old/**
+            **/config.js

@@ -1,0 +1,30 @@
+{
+  "theme": {
+    "dark": {
+      "brand-name": "Cliente",
+      "brand-highlight": "X",
+      "color-accent": "#ff3b3b"
+    }
+  },
+
+  "content": {
+    "home": {
+      "layout": [
+        {
+          "id": "hero",
+          "component": "HeroCliente",
+          "props": {
+            "titulo": "Bem-vindo ao Cliente X",
+            "sub": "Experiência personalizada"
+          }
+        },
+
+        {
+          "id": "promo-banner",
+          "component": "BannerPromo",
+          "type": "append:#content"
+        }
+      ]
+    }
+  }
+}

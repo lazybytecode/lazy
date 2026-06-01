@@ -1,0 +1,158 @@
+{
+  "theme": {
+    "dark": {
+      "brand-name": "Default",
+      "brand-highlight": "LT",
+      "brand-icone": "P",
+      "brand-slogan": "Texto Slogan",
+
+      "color-bg": "#0a0c10",
+      "color-surface": "#111318",
+      "color-surface-2": "#13151f",
+      "color-border": "#1e2130",
+      "color-border-hover": "rgba(230, 190, 190, 0.18)",
+      "color-muted": "#5a607a",
+
+      "color-accent": "#00e5a0",
+      "color-accent-rgb": "0, 229, 160",
+      "color-accent-2": "#005eff",
+      "color-accent-2-rgb": "0, 94, 255",
+
+      "color-text": "#f0f2f8",
+      "color-text-muted": "#7b8099",
+      "color-text-faint": "#3a3f56",
+
+      "gradient-hero": "radial-gradient(elli  pse 80% 60% at 50% -10%, rgba(var(--color-accent-rgb),0.18) 0%, transparent 70%)",
+      "gradient-accent": "linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-2) 100%)",
+
+      "font-display": "'Syne', sans-serif",
+      "font-body": "'DM Sans', sans-serif",
+
+      "radius-md": "12px",
+      "shadow-card": "0 4px 24px rgba(0,0,0,0.4)",
+
+      "cta-primary": "Começar grátis",
+      "cta-secondary": "Ver demo"
+    },
+
+    "light": {
+      "brand-name": "Default",
+      "brand-highlight": "LT",
+      "brand-icone": "P",
+      "brand-slogan": "Texto Slogan",
+
+      "color-bg": "#f5f6fa",
+      "color-surface": "#ffffff",
+      "color-surface-2": "#eef0f7",
+      "color-border": "#dde0ee",
+
+      "color-accent": "#00b87a",
+      "color-accent-rgb": "0, 184, 122",
+
+      "color-text": "#161926",
+      "color-text-muted": "#5a607a"
+    }
+  },
+
+  "routes": [
+    { "path": "/", "view": "home", "title": "Home" },
+    { "path": "/home", "view": "home", "title": "Home" },
+    { "path": "/login", "view": "login", "title": "Login" },
+
+    {
+      "path": "/dashboard",
+      "view": "dashboard",
+      "resolverKey": "dashboard",
+      "roles": ["admin"]
+    },
+    {
+      "path": "/tenant",
+      "view": "dashboard",
+      "resolverKey": "tenant",
+      "roles": ["admin"]
+    }
+  ],
+
+  "content": {
+    "login": {
+      "layout": [
+        {
+          "id": "login-form",
+          "component": "LoginForm",
+          "type": "append:#content",
+          "props": {
+            "icon": "P"
+          }
+        }
+      ]
+    },
+
+    "home": {
+      "layout": [
+        {
+          "id": "nav",
+          "component": "Nav",
+          "type": "slot:topo"
+        },
+
+        {
+          "id": "hero",
+          "component": "Hero",
+          "type": "slot:hero",
+          "props": {
+            "titulo": "Escale seu negócio",
+            "sub": "Automatize e cresça"
+          }
+        },
+
+        {
+          "id": "nav-links",
+          "component": "Nav_links",
+          "type": "append:#navLinks",
+          "props": {
+            "links": {
+              "Home": { "href": "/" },
+              "Login": { "href": "/login" }
+            }
+          }
+        },
+
+        {
+          "id": "theme-switch",
+          "component": "Switch",
+          "type": "append:#tswitch"
+        }
+      ]
+    },
+
+    "dashboard": {
+      "layout": [
+        {
+          "id": "sidebar",
+          "component": "Nav_links",
+          "type": "slot:sidebar",
+          "static": true,
+          "props": {
+            "links": {
+              "Dashboard": { "page": "/dashboard" },
+              "Tenant": { "page": "/tenant" }
+            }
+          }
+        },
+
+        {
+          "id": "main",
+          "component": "_telas/dashboard",
+          "type": "slot:main",
+          "resolver": {
+            "type": "route",
+            "map": {
+              "dashboard": "_telas/dashboard",
+              "tenant": "_telas/tenant"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

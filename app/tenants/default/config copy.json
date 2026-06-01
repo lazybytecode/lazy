@@ -1,0 +1,136 @@
+{
+  "theme": {
+    "dark": {
+      "bg": "#111827",
+      "primary": "#22c55e",
+      "text": "#e5e7eb"
+    },
+    "light": {
+      "bg":"#0a0c10",
+      "surface":"#111318",
+      "surface2":"#13151f",
+      "surface3":"#1a1d28",
+      "border":"rgba(255,255,255,0.07)",
+      "border2":"rgba(255,255,255,0.12)",
+      "text":"#f0f2f8",
+      "muted":"#7b8099",
+      "faint":"#3a3f56",
+      "accent":"#00e5a0",
+      "accent2":"#005eff",
+      "warm":"#ff6b35",
+      "amber":"#f39c12",
+      "pink":"#e84393",
+      "purple":"#9b5de5",
+      "font":"'DM Sans',sans-serif",
+      "font":"'Syne',sans-serif",
+      "r":"16px",
+      "rsm":"10px",
+      "rfull": "9999px"
+    }
+  },
+  "routes": [
+    { "path": "/", "view": "home", "title": "Home Cliente 1" },
+    { "path": "/dashboard", "view": "dashboard", "title": "Painel", "roles": ["admin"] },
+    { "path": "/dbml", "view": "dbml", "title": "DBML" }
+  ],
+
+  "content": {
+    "home": {
+      "title": "Cliente 1",
+      "subtitle": "Sistema personalizado",
+      "cta": "Começar agora"
+    },
+
+    "dashboard": {
+
+      "greeting": "Bem-vindo Admin",
+
+      "layout": [
+        { 
+          "component": "Nav_links",
+          "static": true,
+          "props": { "title": "Conversão", "value": "12%",
+          "links": {
+              "lazybyte - DEV": { "classe":"sb-group" },
+              "": { "classe":"sb-sep" },
+              "DBML Editor": { "page": "/dashboard?sidebar=dbml", "icon": "⬡", "classe":"sb-item" },
+              "Estoque": { "page": "/dashboard?sidebar=estoque", "icon": "⬡", "badge": 5, "classe":"sb-item" }
+          }
+        },
+
+          "type": "slot:sidebar"
+        },
+
+        {
+          "component":"_telas/dashboard",
+          "type":"slot:main"
+        },
+
+        {
+          "component":"Top_bar",
+          "type":"slot:topbar",
+          "props": {
+            "btn_txt": "Cadastrar Item"
+          }       
+        },
+
+        {
+          "component":"Alert",
+          "type":"slot:topbar",
+          "props": {
+            "mensagem": "3 produtos</strong> com estoque crítico — Vermífugo Caninus, Vacina Polivalente, Ração Agro Premium",
+            "btn_txt": "Ver estoque",
+            "action": "alert('estoque')",
+            "icon": "⚠"
+          },
+          "multiple": true
+        },
+
+        {
+          "component":"Kpi",
+          "type":"slot:kpi",
+          "props": {
+            "item": [
+              { "label" : "Receita Total", "value" : "R$847K", "change" : "18.3%", "type" : "up" }, 
+              { "label" : "Pedidos" , "value" : "1.342", "change" : "9.1%%", "type" : "up" }, 
+              { "label" : "Clientes Ativos" , "value" : "318", "change" : "24", "type" : "up" }, 
+              { "label" : "Ticket Médio" , "value" : "R$631", "change" : "2.4%", "type" : "dn" } 
+            ],
+            "cores" : [ "accent", "accent2", "warm", "amber", "pink", "purple" ]
+          }
+        },
+
+        {
+          "component":"Card",
+          "type":"slot:cards",
+          "props" : {
+            "cards" : [
+              { "card01" : "" },
+              { "card01" : "" }
+            ]
+          }
+        },
+
+        {
+          "component":"Kpi",
+          "type":"slot:cards",
+          "props": {
+            "item": [
+              { "label" : "Receita Total", "value" : "R$847K", "change" : "18.3%", "type" : "up" }, 
+              { "label" : "Pedidos" , "value" : "1.342", "change" : "9.1%%", "type" : "up" }, 
+              { "label" : "Clientes Ativos" , "value" : "318", "change" : "24", "type" : "up" }, 
+              { "label" : "Ticket Médio" , "value" : "R$631", "change" : "2.4%", "type" : "dn" } 
+            ],
+            "cores" : [ "accent", "accent2", "warm", "amber", "pink", "purple" ]
+          },
+          "multiple" : true
+        }
+
+      ],
+      "stats": {
+        "users": 200,
+        "sales": 120
+      }
+    }
+  }
+}

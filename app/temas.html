@@ -1,0 +1,641 @@
+
+<style>
+:root {
+  --brand-name: "PetAI";
+  --logo-size: 2.3rem;
+  --color-bg: #f5f6fa;
+  --color-surface: #ffffff;
+  --color-surface-2: #eef0f7;
+  --color-border: #dde0ee;
+  --color-border-hover: rgba(80, 60, 180, 0.18);
+  --color-muted: #9ca3bf;
+  --color-amber: #e08b00;
+  --color-accent: #00b87a;
+  --color-accent-rgb: 0, 184, 122;
+  --color-accent-2: #0050e0;
+  --color-accent-2-rgb: 0, 80, 224;
+  --color-accent-warm: #e84e1b;
+  --color-text: #161926;
+  --color-text-muted: #5a607a;
+  --color-text-faint: #adb3cc;
+  --gradient-hero: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(var(--color-accent-rgb),0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 85% 30%, rgba(var(--color-accent-2-rgb),0.08) 0%, transparent 60%);
+  --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-2) 100%);
+  --gradient-card: linear-gradient(160deg, var(--color-surface-2) 0%, var(--color-surface) 100%);
+  --font-display: 'Sora', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+  --shadow-glow: 0 0 40px rgba(var(--color-accent-rgb), 0.18);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-float: 0 20px 60px rgba(0,0,0,0.12);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 200ms;
+  --dur-med: 400ms;
+  --dur-slow: 700ms;
+  --max-width: 1200px;
+  --nav-height: 72px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+/* NAV */
+nav {
+  height: var(--nav-height);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-8);
+  box-shadow: var(--shadow-card);
+}
+.logo {
+  font-family: var(--font-display);
+  font-size: var(--logo-size);
+  font-weight: 700;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.nav-links { display: flex; gap: var(--space-6); }
+.nav-links a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: color var(--dur-fast);
+}
+.nav-links a:hover { color: var(--color-text); }
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* BUTTONS */
+.btn-primary {
+  background: var(--gradient-accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  box-shadow: var(--shadow-glow);
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-spring);
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-secondary {
+  background: transparent;
+  color: var(--color-accent-2);
+  border: 1.5px solid var(--color-accent-2);
+  border-radius: var(--radius-full);
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.btn-secondary:hover { background: rgba(var(--color-accent-2-rgb),0.07); }
+
+/* HERO */
+.hero {
+  background: var(--gradient-hero), var(--color-bg);
+  padding: var(--space-24) var(--space-8) var(--space-16);
+  text-align: center;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+.hero-tag {
+  display: inline-block;
+  background: rgba(var(--color-accent-rgb), 0.1);
+  color: var(--color-accent);
+  border: 1px solid rgba(var(--color-accent-rgb), 0.25);
+  border-radius: var(--radius-full);
+  padding: var(--space-1) var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-4);
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-4xl), 5vw, var(--text-6xl));
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.1;
+  margin-bottom: var(--space-4);
+}
+.hero h1 span {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero p {
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  max-width: 540px;
+  margin: 0 auto var(--space-8);
+}
+.hero-buttons { display: flex; gap: var(--space-3); justify-content: center; }
+
+/* CARDS */
+.cards-section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-8) var(--space-16);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+}
+.card {
+  background: var(--gradient-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--dur-med) var(--ease-out), border-color var(--dur-med), transform var(--dur-med) var(--ease-spring);
+}
+.card:hover {
+  box-shadow: var(--shadow-float);
+  border-color: var(--color-border-hover);
+  transform: translateY(-2px);
+}
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: var(--space-4);
+}
+.card-icon.green { background: rgba(var(--color-accent-rgb), 0.12); }
+.card-icon.blue  { background: rgba(var(--color-accent-2-rgb), 0.12); }
+.card-icon.warm  { background: rgba(232,78,27,0.10); }
+.card h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+.card p { color: var(--color-text-muted); font-size: var(--text-sm); }
+
+/* BADGE / CHIP */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.badge-green { background: rgba(var(--color-accent-rgb),0.12); color: #007a52; }
+.badge-blue  { background: rgba(var(--color-accent-2-rgb),0.12); color: #003eb0; }
+.badge-amber { background: rgba(224,139,0,0.12); color: #8a5700; }
+
+/* SECTION LABEL */
+.section-label {
+  padding: var(--space-6) var(--space-8) var(--space-4);
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+.section-label h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
+}
+.section-label p { color: var(--color-text-muted); font-size: var(--text-sm); }
+
+/* COLORS SWATCH */
+.swatches {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-8) var(--space-12);
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+.swatch-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+.swatch span {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+  max-width: 56px;
+}
+
+/* DIVIDER */
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  max-width: var(--max-width);
+  margin: 0 auto var(--space-6);
+}
+
+   .theme-select {
+      appearance: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      cursor: pointer;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .theme-select:hover {
+      border-color: var(--primary);
+    }
+    
+     .theme-dark {
+       /* Brand */
+  --brand-name: "PetAI";
+  --logo-size: 2.3rem;
+
+  /* Cores primárias */
+  --color-bg:           #f5f6fa;
+  --color-surface:      #ffffff;
+  --color-surface-2:    #eef0f7;
+  --color-border:       #dde0ee;
+  --color-border-hover: rgba(80, 60, 180, 0.18);
+  --color-muted:        #9ca3bf;
+  --color-amber:        #e08b00;
+
+  /* Accent (ligeiramente escurecidos para contraste no fundo claro) */
+  --color-accent:       #00b87a;
+  --color-accent-rgb:   0, 184, 122;
+  --color-accent-2:     #0050e0;
+  --color-accent-2-rgb: 0, 80, 224;
+  --color-accent-warm:  #e84e1b;
+
+  /* Texto */
+  --color-text:         #161926;
+  --color-text-muted:   #5a607a;
+  --color-text-faint:   #adb3cc;
+
+  /* Sombras (muito mais suaves no light) */
+  --shadow-glow:  0 0 40px rgba(var(--color-accent-rgb), 0.18);
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-float: 0 20px 60px rgba(0,0,0,0.12);
+
+  /* Gradientes (mantidos, funcionam bem no claro) */
+  --gradient-hero:   radial-gradient(ellipse 80% 60% at 50% -10%, rgba(var(--color-accent-rgb),0.12) 0%, transparent 70%),
+                     radial-gradient(ellipse 50% 40% at 85% 30%, rgba(var(--color-accent-2-rgb),0.08) 0%, transparent 60%);
+  --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-2) 100%);
+  --gradient-card:   linear-gradient(160deg, var(--color-surface-2) 0%, var(--color-surface) 100%);
+
+    /* Tipografia */
+    --font-display:       'Sora', sans-serif;
+    --font-body:          'DM Sans', sans-serif;
+
+    /* Escala tipográfica */
+    --text-xs:    0.75rem;
+    --text-sm:    0.875rem;
+    --text-base:  1rem;
+    --text-lg:    1.125rem;
+    --text-xl:    1.25rem;
+    --text-2xl:   1.5rem;
+    --text-3xl:   1.875rem;
+    --text-4xl:   2.25rem;
+    --text-5xl:   3rem;
+    --text-6xl:   3.75rem;
+    --text-7xl:   4.5rem;
+
+    /* Espaçamento */
+    --space-1:   0.25rem;
+    --space-2:   0.5rem;
+    --space-3:   0.75rem;
+    --space-4:   1rem;
+    --space-6:   1.5rem;
+    --space-8:   2rem;
+    --space-12:  3rem;
+    --space-16:  4rem;
+    --space-24:  6rem;
+    --space-32:  8rem;
+
+    /* Bordas */
+    --radius-sm:  6px;
+    --radius-md:  12px;
+    --radius-lg:  20px;
+    --radius-xl:  32px;
+    --radius-full: 9999px;
+
+    /* Sombras */
+    --shadow-glow:  0 0 40px rgba(var(--color-accent-rgb), 0.25);
+    --shadow-card:  0 4px 24px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.6);
+    --shadow-float: 0 20px 60px rgba(0,0,0,0.5);
+
+    /* Animações */
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+    --dur-fast:    200ms;
+    --dur-med:     400ms;
+    --dur-slow:    700ms;
+
+    /* Layout */
+    --max-width:  1200px;
+    --nav-height: 72px;
+
+    /* CTA Textos (white-label) */
+    --cta-primary:   "Começar grátis";
+    --cta-secondary: "Ver demo";
+    --hero-tag:      "Plataforma #1 em produtividade";
+    --hero-title:    "Escale seu negócio sem limites";
+    --hero-sub:      "A plataforma inteligente que automatiza, analisa e acelera cada etapa da sua operação.";
+
+    /* Dashboard */
+    --bg: #f6f8fb;
+    --surface: #ffffff;
+    --surface2: #f1f4f9;
+
+    --border: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 229, 160, 0.35);
+
+    --text: #0f172a;
+    --muted: #6b7280;
+
+    --accent: #00b894;
+    --accent2: #2563eb;
+
+    --warm: #e8592f;
+    --amber: #d68910;
+    --pink: #d63384;
+
+    --font: 'DM Sans', sans-serif;
+    --font-d: 'Syne', sans-serif;
+
+    --radius: 16px;
+    --radius-sm: 10px;
+    }
+    
+    .theme-light
+    {
+    
+    --brand-name: "Pet<i>AI</i>";
+  --logo-size: 2.3rem;
+
+  /* Cores primárias */
+  --color-bg:           #0a0c10;
+  --color-surface:      #111318;
+  --color-surface-2:    #13151f;
+  --color-border:       #1e2130; /* rgba(255,255,255,0.07);*/
+  --color-border-hover: rgba(230, 190, 190, 0.18);
+  --color-muted:        #5a607a;
+  --color-amber:     #f39c12;
+
+  /* Accent */
+  --color-accent:       #00e5a0;
+  --color-accent-rgb:   0, 229, 160;
+  --color-accent-2:     #005eff;
+  --color-accent-2-rgb: 0, 94, 255;
+  --color-accent-warm:  #ff6b35;
+
+  /* Texto */
+  --color-text:         #f0f2f8;
+  --color-text-muted:   #7b8099;
+  --color-text-faint:   #3a3f56;
+
+  /* Gradientes */
+  --gradient-hero:      radial-gradient(ellipse 80% 60% at 50% -10%, rgba(var(--color-accent-rgb),0.18) 0%, transparent 70%),
+                        radial-gradient(ellipse 50% 40% at 85% 30%, rgba(var(--color-accent-2-rgb),0.12) 0%, transparent 60%);
+  --gradient-accent:    linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-2) 100%);
+  --gradient-card:      linear-gradient(160deg, var(--color-surface-2) 0%, var(--color-surface) 100%);
+
+  /* Tipografia */
+  --font-display:       'Sora', sans-serif;
+  --font-body:          'DM Sans', sans-serif;
+
+  /* Escala tipográfica */
+  --text-xs:    0.75rem;
+  --text-sm:    0.875rem;
+  --text-base:  1rem;
+  --text-lg:    1.125rem;
+  --text-xl:    1.25rem;
+  --text-2xl:   1.5rem;
+  --text-3xl:   1.875rem;
+  --text-4xl:   2.25rem;
+  --text-5xl:   3rem;
+  --text-6xl:   3.75rem;
+  --text-7xl:   4.5rem;
+
+  /* Espaçamento */
+  --space-1:   0.25rem;
+  --space-2:   0.5rem;
+  --space-3:   0.75rem;
+  --space-4:   1rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+  --space-12:  3rem;
+  --space-16:  4rem;
+  --space-24:  6rem;
+  --space-32:  8rem;
+
+  /* Bordas */
+  --radius-sm:  6px;
+  --radius-md:  12px;
+  --radius-lg:  20px;
+  --radius-xl:  32px;
+  --radius-full: 9999px;
+
+  /* Sombras */
+  --shadow-glow:  0 0 40px rgba(var(--color-accent-rgb), 0.25);
+  --shadow-card:  0 4px 24px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.6);
+  --shadow-float: 0 20px 60px rgba(0,0,0,0.5);
+
+  /* Animações */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast:    200ms;
+  --dur-med:     400ms;
+  --dur-slow:    700ms;
+
+  /* Layout */
+  --max-width:  1200px;
+  --nav-height: 72px;
+
+  /* CTA Textos (white-label) */
+  --cta-primary:   "Começar grátis";
+  --cta-secondary: "Ver demo";
+  --hero-tag:      "Plataforma #1 em produtividade";
+  --hero-title:    "Escale seu negócio sem limites";
+  --hero-sub:      "A plataforma inteligente que automatiza, analisa e acelera cada etapa da sua operação.";
+
+  /* Dashboard */
+  --border-hover: rgba(0,229,160,0.25);
+  --text: #f0f2f8;
+  --muted: #7b8099;
+  --accent: #00e5a0;
+  --accent2: #005eff;
+  --warm: #ff6b35;
+  --amber: #f39c12;
+  --pink: #e84393;
+  --font: 'DM Sans', sans-serif;
+  --font-d: 'Syne', sans-serif;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --bg:#0a0c10;
+  --surface:#111318;
+  --surface2:#13151f;
+  --surface3:#1a1d28;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --purple:#9b5de5;
+  --font:'DM Sans',sans-serif;
+  --font-d:'Syne',sans-serif;
+  --r:16px;
+  --rsm:10px;
+  --rfull:9999px;
+  
+  }
+
+    
+</style>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Pet<i>AI</i></div>
+  <div class="nav-links">
+    <a href="#">Produto</a>
+    <a href="#">Preços</a>
+    <a href="#">Docs</a>
+    <a href="#">Blog</a>
+  </div>
+  <div class="nav-cta">
+  <select class="theme-select" id="themeSwitcher">
+    <option value="">Padrão</option>
+    <option value="theme-dark">Dark</option>
+    <option value="theme-sunset">Sunset</option>
+    <option value="theme-ocean">Ocean</option>
+  </select>
+    <button class="btn-secondary">Ver demo</button>
+    <button class="btn-primary">Começar grátis</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Plataforma #1 em produtividade</div>
+  <h1>Escale seu negócio<br><span>sem limites</span></h1>
+  <p>A plataforma inteligente que automatiza, analisa e acelera cada etapa da sua operação.</p>
+  <div class="hero-buttons">
+    <button class="btn-primary">Começar grátis</button>
+    <button class="btn-secondary">Ver demo</button>
+  </div>
+</section>
+
+<!-- CARDS -->
+<div class="section-label">
+  <h2>Recursos principais</h2>
+  <p>Tudo que você precisa em um só lugar</p>
+</div>
+<div class="cards-section">
+  <div class="card">
+    <div class="card-icon green">🤖</div>
+    <h3>Automação IA</h3>
+    <p>Automatize tarefas repetitivas e ganhe horas por semana com inteligência artificial avançada.</p>
+    <br>
+    <span class="badge badge-green">Novo</span>
+  </div>
+  <div class="card">
+    <div class="card-icon blue">📊</div>
+    <h3>Analytics em tempo real</h3>
+    <p>Dashboards interativos com insights acionáveis para tomada de decisão mais rápida.</p>
+    <br>
+    <span class="badge badge-blue">Popular</span>
+  </div>
+  <div class="card">
+    <div class="card-icon warm">⚡</div>
+    <h3>Integrações nativas</h3>
+    <p>Conecte suas ferramentas favoritas em minutos com mais de 200 integrações disponíveis.</p>
+    <br>
+    <span class="badge badge-amber">200+ apps</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- SWATCHES -->
+<div class="section-label">
+  <h2>Paleta de cores — tema light</h2>
+  <p>Tokens de cor adaptados para fundo claro</p>
+</div>
+<div class="swatches">
+  <div class="swatch"><div class="swatch-dot" style="background:#f5f6fa"></div><span>bg</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#ffffff"></div><span>surface</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#eef0f7"></div><span>surface-2</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#dde0ee"></div><span>border</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#161926"></div><span>text</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#5a607a"></div><span>muted</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#adb3cc"></div><span>faint</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#00b87a"></div><span>accent</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#0050e0"></div><span>accent-2</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#e84e1b"></div><span>warm</span></div>
+  <div class="swatch"><div class="swatch-dot" style="background:#e08b00"></div><span>amber</span></div>
+</div>
+
+<script>
+    const select = document.getElementById("themeSwitcher");
+
+    select.addEventListener("change", () => {
+      document.documentElement.className = ""; // limpa temas
+      if (select.value) {
+        document.documentElement.classList.add(select.value);
+      }
+    });
+  </script>

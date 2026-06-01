@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br" >
+<head>
+  <meta charset="UTF-8">
+  <title>SaaS App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Sora:wght@100..800&family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  
+</head>
+<body>
+
+  <div id="loader">
+    <div class="spinner"></div>
+    <div id="percent">0%</div>
+  </div>
+
+  <!-- Cursor customizado -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Scroll progress -->
+  <div class="scroll-progress">
+    <div class="scroll-progress-bar" id="scrollBar"></div>
+  </div>
+
+  <div id="app"></div>
+
+  <script type="module" src="/app.js"></script>
+  <script>
+  const percentText = document.getElementById("percent");
+  const loader = document.getElementById("loader");
+  const content = document.getElementById("app");
+
+  let progress = 0;
+
+  function updateProgress(value) {
+    progress = Math.min(value, 100);
+    percentText.textContent = Math.floor(progress) + "%";
+  }
+
+  // Conta recursos carregados (imagens, scripts, css, etc.)
+  function trackResources() {
+    const resources = performance.getEntriesByType("resource");
+    const total = resources.length;
+
+    if (total === 0) return;
+
+    let loaded = 0;
+
+    resources.forEach(res => {
+      if (res.responseEnd > 0) {
+        loaded++;
+      }
+    });
+
+    const percent = (loaded / total) * 100;
+    updateProgress(percent);
+  }
+
+  // Atualiza continuamente
+  const interval = setInterval(() => {
+    trackResources();
+  }, 100);
+
+  // Quando tudo termina
+  window.addEventListener("load", () => {
+    clearInterval(interval);
+    updateProgress(100);
+
+    setTimeout(() => {
+      loader.style.opacity = "0";
+      loader.style.transition = "opacity 0.4s ease";
+
+      setTimeout(() => {
+        loader.style.display = "none";
+        content.style.display = "block";
+      }, 400);
+    }, 300);
+  });
+</script>
+
+</body>
+</html>

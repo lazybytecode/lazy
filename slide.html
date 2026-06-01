@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Slide SaaS</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg,#0b1020,#020617);
+  color: #fff;
+}
+
+.container {
+  max-width: 1400px;
+  margin: auto;
+  padding: 40px;
+}
+
+/* HEADER */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  font-size: 42px;
+  margin-top: -20px;
+}
+
+.header .topline {
+  font-size: 20px;
+}
+
+.header h1 strong {
+  color: #60a5fa;
+}
+
+.subtitle {
+  color: #94a3b8;
+  margin-bottom: 30px;
+  margin-top: -20px;
+  font-size: 23px;
+}
+
+.bloco {
+  grid-column: span 2;
+}
+
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.card {
+  background: rgba(15,23,42,0.7);
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+/* PROBLEM */
+.problem { border-left: 4px solid #ef4444; }
+.solution { border-left: 4px solid #22c55e; }
+
+.card h3 {
+  margin-bottom: 10px;
+}
+
+.card ul {
+  padding-left: 15px;
+}
+
+.card li {
+  margin-bottom: 8px;
+  color: #cbd5f5;
+}
+
+/* FLOW */
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: rgba(15,23,42,0.7);
+  padding: .5rem 1rem;
+}
+
+.flow h4 {
+  position: absolute;
+  top: -3rem;
+  left: 50%;
+  transform: translateX( -50% );
+  background: rgba( 255, 255, 255 , 0.2 );
+  padding: 0.3rem .7rem;
+  font-size: 0.9rem;
+  width: 60%;
+  border-radius: .3rem;
+  border: solid 1px rgba( 255, 255, 255 , 0.4 );
+}
+
+.flow > div {
+  display: flex;
+}
+
+.phone {
+  flex: 1;
+  background: #0b1220;
+  border-radius: 20px;
+  padding: 15px;
+  border: 1px solid #1e293b;
+  text-align: center;
+  position: relative;
+}
+
+.phone h4 {
+  color: #60a5fa;
+  margin-bottom: 10px;
+}
+
+/* MOCKUP AREA */
+.mockup {
+  height: 260px;
+  background: linear-gradient(135deg,#1e293b,#020617);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 14px;
+  border: 1px dashed #334155;
+}
+
+/* DIFFERENTIALS */
+.differentials {
+  margin-top: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.diff {
+  flex: 1;
+  background: rgba(15,23,42,0.7);
+  padding: 15px;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid #1e293b;
+}
+
+/* BOTTOM GRID */
+.bottom {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+/* SECURITY */
+.security-box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sec {
+  background: #020617;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #1e293b;
+  font-size: 12px;
+}
+
+/* METRICS */
+.metrics {
+  display: flex;
+  gap: 10px;
+}
+
+.metric {
+  flex: 1;
+  background: #020617;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid #1e293b;
+}
+
+.green { color: #22c55e; }
+.red { color: #ef4444; }
+
+/* ANIMATION */
+.fade {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: 0.5s;
+}
+
+.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#solucao-lista,
+#problema-lista,
+#tecnologia
+{
+  list-style-type: none;
+  line-height: 200%;
+}
+
+#problema-lista li::before
+{
+  content: "\f057";
+  font-family: "Font Awesome 7 Free"; /* ou 5 dependendo da versão */
+  font-weight: 0; /* necessário para ícones sólidos */
+  margin-right: 0.5rem;
+  color: #ef4444;
+  font-size: 1.5rem;
+}
+
+#solucao-lista li::before
+{
+  content: "\f058";
+  font-family: "Font Awesome 7 Free"; /* ou 5 dependendo da versão */
+  font-weight: 0; /* necessário para ícones sólidos */
+  margin-right: 0.5rem;
+  color: #22c55e;
+  font-size: 1.5rem;
+}
+
+.diff i
+{
+  display: block;
+  transform: scale(1.8);
+  margin: 1.5rem auto;
+  width: 100%;
+  text-shadow: 0 0 10px rgba(255,255,255,.4);
+}
+
+.diff:nth-child(1) i
+{
+  color: #A020F0;
+}
+
+.diff:nth-child(2) i
+{
+  color: #60a5fa;
+}
+
+.diff:nth-child(3) i
+{
+  color: #22c55e;
+}
+
+.diff h2
+{
+  font-size: 1rem;
+}
+
+#tecnologia li::before
+{
+  content: "\f058";
+  font-family: "Font Awesome 7 Free"; /* ou 5 dependendo da versão */
+  font-weight: 0; /* necessário para ícones sólidos */
+  margin-right: 0.5rem;
+  color: #A020F0;
+  font-size: 1.5rem;
+  font-weight: 900;
+}
+
+#solucao-lista::before
+{
+  content: "\f061";
+  font-family: "Font Awesome 7 Free"; /* ou 5 dependendo da versão */
+  font-weight: 0; /* necessário para ícones sólidos */
+  margin-right: 0.5rem;
+  color: #60a5fa;
+  font-size: 3rem;
+  font-weight: 900;
+  position: absolute;
+  left: -3.5rem;
+  top: 40%;
+}
+
+.avanca ,
+.voltar
+{
+  font-family: "Font Awesome 7 Free"; /* ou 5 dependendo da versão */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5rem;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0);
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 999;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.5s ease-in-out;
+}
+
+.voltar
+{
+  left: 0;
+}
+
+.avanca:hover,
+.voltar:hover
+{
+  background: rgba(255, 255, 255, 0.1);
+}
+
+</style>
+</head>
+
+<body>
+<a class="avanca" href="javascrip:;" onclick="proximoSlide()" ><i class="fa-solid fa-angles-right"></i></a>
+<a class="voltar" href="javascrip:;" onclick="slideAnterior()" ><i class="fa-solid fa-angles-left"></i></a>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header fade">
+    <div>
+      <p class="topline" style="color: #A020F0;" >
+        <!-- topline -->
+          Funcionalidades Principais
+        <!-- /topline -->
+      </p>
+
+      <h1>
+        <!-- titulo -->
+         Cadastro, Login e <strong>Segurança</strong>
+        <!-- /titulo -->
+        </h1>
+      <p class="subtitle">
+        <!-- subtitulo -->
+          Simples para o usuário. Robusto para o seu negócio.
+        <!-- /subtitulo -->
+      </p>
+    </div>
+    <h2>
+      <!-- logo -->
+        FlowPro
+      <!-- /logo -->
+    </h2>
+  </div>
+
+  <div class="grid">
+    
+    <!-- PROBLEMA / SOLUÇÃO -->
+    <div class="grid">
+      <div class="card problem fade">
+        <h3 style="color: #ef4444;">❌ Problema</h3>
+        <ul id="problema-lista" >
+        <!-- problema -->
+         <!-- /problema -->
+        </ul>
+      </div>
+
+      <div class="card solution fade">
+        <h3 style="color: #22c55e;" >✅ Solução</h3>
+        <ul id="solucao-lista">
+        <!-- solução -->
+        <!-- /solução -->
+        </ul>
+      </div>
+
+      <div class="bloco">      
+        <!-- DIFERENCIAIS -->
+        <div id="diferenciais" class="differentials fade">
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FLOW MOCKUP -->
+    <div class="flow">
+      <h3> Experiência do Usuário</h3>
+
+      <div>
+        <div class="phone fade">
+          <h4>1. Login</h4>
+          <div class="mockup">[ INSERIR MOCKUP LOGIN ]</div>
+        </div>
+
+        <div class="phone fade">
+          <h4>2. Cadastro</h4>
+          <div class="mockup">[ INSERIR MOCKUP CADASTRO ]</div>
+        </div>
+
+        <div class="phone fade">
+          <h4>3. Onboarding</h4>
+          <div class="mockup">[ INSERIR MOCKUP ONBOARDING ]</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BOTTOM -->
+  <div class="bottom">
+
+    <!-- TEC -->
+    <div class="card fade">
+      <h2 style="color: #A020F0;"> <i class="fa-solid fa-laptop-code"></i> Tecnologias</h2>
+      <ul id="tecnologia" >
+      </ul>
+    </div>
+
+    <!-- SECURITY -->
+    <div class="card fade">
+      <h3>🔒 Segurança</h3>
+      <div class="security-box">
+        <div class="sec">AES-256</div>
+        <div class="sec">2FA</div>
+        <div class="sec">JWT</div>
+        <div class="sec">LGPD</div>
+        <div class="sec">Backups</div>
+        <div class="sec">Anti-CSRF</div>
+      </div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="card fade">
+      <h3>📊 Impacto</h3>
+      <div class="metrics">
+        <div class="metric">
+          <h2 class="red">-50%</h2>
+          <p>Abandono</p>
+        </div>
+        <div class="metric">
+          <h2 class="green">+35%</h2>
+          <p>Conversão</p>
+        </div>
+        <div class="metric">
+          <h2 class="green">+25%</h2>
+          <p>Retenção</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+let slides = [];
+let slideAtual = 0;
+
+let gist_id = null;
+
+function getParams() {
+  const params = new URLSearchParams(window.location.search);
+
+  return {
+    gist: params.get("g"),
+    slide: parseInt(params.get("slide")) || 0
+  };
+}
+
+async function carregarConteudo() {
+  const response = await fetch(`https://api.github.com/gists/${gist_id}`);
+  const data = await response.json();
+  const arquivo = Object.values(data.files)[0].content;
+  return JSON.parse(arquivo); // ARRAY
+}
+
+/* ---------- APPLY ---------- */
+
+function aplicarLista(id, itens = []) {
+  const ul = document.getElementById(id);
+  ul.innerHTML = "";
+
+  if (!Array.isArray(itens)) return;
+
+  itens.forEach(item => {
+    const li = document.createElement("li");
+    li.innerHTML = item;
+    ul.appendChild(li);
+  });
+}
+
+function aplicarDif(id, itens = []) {
+  const dif = document.getElementById(id);
+  dif.innerHTML = "";
+
+  if (!Array.isArray(itens)) return;
+
+  itens.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "card fade diff";
+
+    div.innerHTML = `
+      <i class="${item.icone}"></i>
+      <h3>${item.titulo}</h3>
+      <p>${item.texto}</p>
+    `;
+
+    dif.appendChild(div);
+  });
+}
+
+function aplicarConteudo(conteudo) {
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_COMMENT
+  );
+
+  let node;
+
+  while (node = walker.nextNode()) {
+    const chave = node.nodeValue.trim();
+
+    if (conteudo[chave]) {
+      let current = node.nextSibling;
+      let elementos = [];
+
+      while (current && !(current.nodeType === 8 && current.nodeValue.trim() === "/" + chave)) {
+        elementos.push(current);
+        current = current.nextSibling;
+      }
+
+      elementos.forEach(el => el.remove());
+
+      const span = document.createElement("span");
+      span.innerHTML = conteudo[chave];
+
+      node.parentNode.insertBefore(span, current);
+    }
+  }
+}
+
+/* ---------- SLIDES ---------- */
+
+function mostrarSlide(slide) {
+  if (!slide) return;
+
+  aplicarConteudo(slide);
+  aplicarLista("problema-lista", slide.problema);
+  aplicarLista("solucao-lista", slide.solução);
+  aplicarLista("tecnologia", slide.tecnologia);
+  aplicarDif("diferenciais", slide.diferenciais);
+
+  animar();
+}
+
+function proximoSlide() {
+  slideAtual++;
+
+  if (slideAtual >= slides.length) {
+    slideAtual = 0;
+  }
+
+  mostrarSlide(slides[slideAtual]);
+  atualizarURL();
+}
+
+function slideAnterior() {
+  slideAtual--;
+
+  if (slideAtual < 0) {
+    slideAtual = slides.length - 1;
+  }
+
+  mostrarSlide(slides[slideAtual]);
+  atualizarURL();
+}
+
+/* ---------- ANIMAÇÃO ---------- */
+
+function animar() {
+  document.querySelectorAll(".fade").forEach(el => {
+    el.classList.remove("show");
+  });
+
+  document.querySelectorAll(".fade").forEach((el, i) => {
+    setTimeout(() => el.classList.add("show"), i * 100);
+  });
+}
+
+function atualizarURL() {
+  const url = new URL(window.location);
+
+  url.searchParams.set("g", gist_id);
+  url.searchParams.set("slide", slideAtual);
+
+  window.history.replaceState({}, "", url);
+}
+
+/* ---------- INIT ---------- */
+
+window.onload = async () => {
+  const params = getParams();
+
+  gist_id = params.gist || '235bd5c9742f0a60d2cc3675ee18478d';
+  slideAtual = params.slide || 0;
+
+  slides = await carregarConteudo();
+
+  if (!slides || slides.length === 0) return;
+
+  if (slideAtual >= slides.length) slideAtual = 0;
+
+  mostrarSlide(slides[slideAtual]);
+  atualizarURL();
+};
+</script>
+
+</body>
+</html>

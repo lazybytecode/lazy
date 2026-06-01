@@ -1,0 +1,230 @@
+{
+  "theme": {
+    "dark": {
+      "brand-name" : "Pet<i>AI</i>",
+      "brand-icone" : "P",
+      "brand-slogan": "Texto Slogan",
+
+      "color-bg":           "#0e0a06",
+      "color-surface":      "#18120a",
+      "color-surface-2":    "#201808",
+      "color-border":       "#342410",
+      "color-border-hover": "rgba(220, 170, 60, 0.22)",
+      "color-muted":        "#6a4c1a",
+      "color-amber":        "#e0aa40",
+      "color-accent":       "#e8b84a",
+      "color-accent-rgb":   "232, 184, 74",
+      "color-accent-2":     "#c08840",
+      "color-accent-2-rgb": "192, 136, 64",
+      "color-accent-warm":  "#e8b84a",
+      "color-text":         "#f4e8d0",
+      "color-text-muted":   "#907040",
+      "color-text-faint":   "#302010",
+      "gradient-hero":      "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(232,184,74,0.18) 0%, transparent 70%),radial-gradient(ellipse 50% 40% at 85% 30%, rgba(192,136,64,0.12) 0%, transparent 60%)",
+      "gradient-accent":    "linear-gradient(135deg, #e8b84a 0%, #c08840 100%)",
+      "gradient-card":      "linear-gradient(160deg, #201808 0%, #18120a 100%)",
+      "shadow-glow":        "0 0 40px rgba(232, 184, 74, 0.28)",
+      "shadow-card":        "0 4px 24px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.7)",
+      "shadow-float":       "0 20px 60px rgba(0,0,0,0.6)",
+
+      "font-display" :       "'Syne', sans-serif",
+      "font-body" :          "'DM Sans', sans-serif",
+      "text-xs" :    "0.75rem",
+      "text-sm" :    "0.875rem",
+      "text-base" :  "1rem",
+      "text-lg" :    "1.125rem",
+      "text-xl" :    "1.25rem",
+      "text-2xl" :   "1.5rem",
+      "text-3xl" :   "1.875rem",
+      "text-4xl" :   "2.25rem",
+      "text-5xl" :   "3rem",
+      "text-6xl" :   "3.75rem",
+      "text-7xl" :   "4.5rem",
+
+      "space-1"  :   "0.25rem",
+      "space-2"  :   "0.5rem",
+      "space-3"  :   "0.75rem",
+      "space-4"  :   "1rem",
+      "space-6"  :   "1.5rem",
+      "space-8"  :   "2rem",
+      "space-12" :  "3rem",
+      "space-16" :  "4rem",
+      "space-24" :  "6rem",
+      "space-32" :  "8rem",
+
+      "radius-sm" :  "6px",
+      "radius-md" :  "12px",
+      "radius-lg" :  "20px",
+      "radius-xl" :  "32px",
+      "radius-full" : "9999px",
+
+      "ease-spring" : "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "ease-out" :    "cubic-bezier(0.22, 1, 0.36, 1)",
+      "dur-fast" :    "200ms",
+      "dur-med" :     "400ms",
+      "dur-slow" :    "700ms",
+
+      "max-width"  :  "1200px",
+      "nav-height" : "72px",
+
+      "cta-primary" :   "Começar grátis",
+      "cta-secondary" : "Ver demo",
+      "hero-tag" :      "Plataforma #1 em produtividade",
+      "hero-title" :    "Escale seu negócio sem limites",
+      "hero-sub" :      "A plataforma inteligente que automatiza, analisa e acelera cada etapa da sua operação."
+    },
+    "light": {
+      "brand-name" : "Pet<i>AI</i>",
+      "brand-icone" : "P",
+      "brand-slogan": "Texto Slogan",
+
+      "color-bg":           "#faf9f7",
+      "color-surface":      "#ffffff",
+      "color-surface-2":    "#f2ede6",
+      "color-border":       "#e8d8c0",
+      "color-border-hover": "rgba(201, 153, 60, 0.22)",
+      "color-muted":        "#b09470",
+      "color-amber":        "#c9993c",
+      "color-accent":       "#c9993c",
+      "color-accent-rgb":   "201, 153, 60",
+      "color-accent-2":     "#8c6030",
+      "color-accent-2-rgb": "140, 96, 48",
+      "color-accent-warm":  "#c9993c",
+      "color-text":         "#1a1410",
+      "color-text-muted":   "#6b4a2a",
+      "color-text-faint":   "#d4bc98",
+      "gradient-hero":      "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,153,60,0.1) 0%, transparent 70%),radial-gradient(ellipse 50% 40% at 85% 30%, rgba(140,96,48,0.08) 0%, transparent 60%)",
+      "gradient-accent":    "linear-gradient(135deg, #c9993c 0%, #8c6030 100%)",
+      "gradient-card":      "linear-gradient(160deg, #f2ede6 0%, #ffffff 100%)",
+      "shadow-glow":        "0 0 40px rgba(201, 153, 60, 0.18)",
+      "shadow-card":        "0 4px 24px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
+      "shadow-float":       "0 20px 60px rgba(0,0,0,0.1)",      
+
+      "font-display" :       "'Sora', sans-serif",
+      "font-body" :          "'DM Sans', sans-serif",
+
+      "text-xs" :   "0.75rem",
+      "text-sm" :   "0.875rem",
+      "text-base" :  "1rem",
+      "text-lg" :   "1.125rem",
+      "text-xl" :   "1.25rem",
+      "text-2xl" :   "1.5rem",
+      "text-3xl" :   "1.875rem",
+      "text-4xl" :   "2.25rem",
+      "text-5xl" :   "3rem",
+      "text-6xl" :   "3.75rem",
+      "text-7xl" :   "4.5rem",
+
+      "space-1" :   "0.25rem",
+      "space-2" :   "0.5rem",
+      "space-3" :   "0.75rem",
+      "space-4" :   "1rem",
+      "space-6" :   "1.5rem",
+      "space-8" :   "2rem",
+      "space-12":  "3rem",
+      "space-16":  "4rem",
+      "space-24":  "6rem",
+      "space-32":  "8rem",
+
+      "radius-sm":  "6px",
+      "radius-md":  "12px",
+      "radius-lg":  "20px",
+      "radius-xl":  "32px",
+      "radius-full": "9999px",
+
+      "ease-spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "ease-out" :    "cubic-bezier(0.22, 1, 0.36, 1)",
+      "dur-fast":    "200ms",
+      "dur-med":     "400ms",
+      "dur-slow":    "700ms",
+
+      "max-width" :  "1200px",
+      "nav-height": "72px",
+
+      "cta-primary":   "Começar grátis",
+      "cta-secondary": "Ver demo",
+      "hero-tag":      "Plataforma #1 em produtividade",
+      "hero-title":    "Escale seu negócio sem limites",
+      "hero-sub":      "A plataforma inteligente que automatiza, analisa e acelera cada etapa da sua operação.",
+
+      "bg": "#f6f8fb",
+      "surface": "#ffffff",
+      "surface2": "#f1f4f9",
+
+      "border": "rgba(0, 0, 0, 0.08)",
+      "border-hover": "rgba(0, 229, 160, 0.35)",
+
+      "text": "#0f172a",
+      "muted": "#6b7280",
+
+      "accent": "#00b894",
+      "accent2": "#2563eb",
+
+      "warm": "#e8592f",
+      "amber": "#d68910",
+      "pink": "#d63384",
+
+      "font": "var(--font-body)",
+      "font-d": "var(--font-display)",
+
+      "radius": "16px"
+    }
+  },
+
+  "routes": [
+    {
+      "path": "/",
+      "view": "home",
+      "title": "Home Cliente 1"
+    },
+
+    {
+      "path": "/home",
+      "view": "home",
+      "title": "Home Cliente 1"
+    },
+
+    {
+      "path": "/login",
+      "view": "login",
+      "title": "Conecte-se"
+    },
+
+    {
+      "path": "/dashboard",
+      "view": "dashboard",
+      "title": "Painel",
+      "resolverKey": "dashboard",
+      "roles": ["admin"]
+    },
+
+    {
+      "path": "/temas",
+      "view": "dashboard",
+      "title": "Editor de Temas",
+      "resolverKey": "temas",
+      "roles": ["admin"]
+    },
+
+    {
+      "path": "/tenant",
+      "view": "dashboard",
+      "title": "Tenant",
+      "resolverKey": "tenant",
+      "roles": ["admin"]
+    },
+
+    {
+      "path": "/estoque",
+      "view": "dashboard",
+      "title": "Estoque",
+      "resolverKey": "estoque",
+      "roles": ["admin"]
+    }
+
+  ]
+
+}
+
+
+

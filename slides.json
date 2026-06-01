@@ -1,0 +1,44 @@
+[
+  {
+    "logo": "PET<span>AI</span>",
+    "topline": "<i class=\"fa-solid fa-shield-halved\"></i> Proteção e Privacidade!",
+    "titulo": "Seguro e <strong>Inteligente</strong>",
+    "subtitulo": "Frontend Seguro com Criptografia E2E",
+    "problema":[
+      "Interfaces com respostas lentas.",
+      "Alto tráfego por processamento.",
+      "Phishing com roubo de dados.",
+      "Vazamento/Exposição de dados."
+    ],
+    "solução": [
+      "Load assíncrono nas telas.",
+      "Reaproveitamento de sessão.",
+      "Assinatura digital nas transações.",
+      "Criptografiia de Ponta a Ponta."
+    ],
+    "tecnologia": ["Node", "JWT"],
+    "diferenciais": [
+      {
+        "icone": "fa-solid fa-brain",
+        "titulo": "Criptografia End-to-End",
+        "texto": "Criptografia contra interceptação e vazamento."
+      },
+      {
+        "icone": "fa-solid fa-bolt-lightning",
+        "titulo": "Experiência Fluida",
+        "texto": "Interface rápida e responsiva em requisições complexas."
+      },
+      {
+        "icone": "fa-solid fa-lock",
+        "titulo": "Anti Ataques",
+        "texto": "Mecanismos modernos como anti-replay e assinatura digital."
+      },
+      {
+        "icone": "fa-solid fa-repeat",
+        "titulo": "Moderno e Escalável",
+        "texto": "Frontend desacoplado e seguro nos dispositivos."
+      }
+    ]
+  }
+
+]
