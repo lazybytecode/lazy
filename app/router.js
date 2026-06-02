@@ -94,6 +94,7 @@ async function fetchJSON(caminho, tenant = "default", dados = {}) {
     let json = null
 
     try {
+
       json = await res.json()
 
       if (!json || json.error) {
@@ -192,6 +193,8 @@ async function loadConfig() {
           routes: Array.isArray(dec.routes) ? dec.routes : [],
           content: dec.content || {}
         })
+
+        console.error( defaultConfig )
       }
     } catch (e) {
       console.error("decrypt default falhou", e)

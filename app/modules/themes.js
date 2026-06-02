@@ -56,19 +56,17 @@ export async function applyTheme() {
 
     const root = document.documentElement
 
-    const themeConfig = themes?.theme?.[theme]
+    root.setAttribute( 'data-theme', theme );
 
-    if (!themeConfig) return
+    root.setAttribute( 'data-tenant', tenant );
 
-    document.documentElement.dataset.tenant = tenant
+    root.style.transition = "background-color 0.3s ease, color 0.3s ease";
 
-    root.setAttribute("data-theme", theme)
+    const themeName = theme; 
 
-    root.style.transition = "background-color 0.3s ease, color 0.3s ease"
-
-    Object.entries(themeConfig).forEach(([key, value]) => {
-      root.style.setProperty(`--${key}`, value)
-    })
+    Object.entries(themes.theme[themeName]).forEach(([key, value]) => {
+      root.style.setProperty(`--${key}`, value);
+    });
 
     setTimeout(() => {
       root.style.transition = ""
