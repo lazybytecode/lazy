@@ -38,7 +38,8 @@ function base64ToBytes(b64) {
 // =====================================================
 
 async function importServerPublicKey() {
-  const pem = SERVER_SIGN_PUBLIC_PEM
+    const pem = CONFIG.PUBLIC_KEY
+    .replace(/\\n/g, "\n")
     .replace("-----BEGIN PUBLIC KEY-----", "")
     .replace("-----END PUBLIC KEY-----", "")
     .replace(/\s/g, "")
