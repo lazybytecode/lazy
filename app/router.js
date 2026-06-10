@@ -2,7 +2,7 @@ import { CONFIG } from "./config.js"
 
 import { cria_chaves, decrypt_response } from "./modules/crypto.js"
 
-export { getTenant, loadConfig, navigate, withTenant, fetchJSON, getAPI, loadComponent }
+export { getTenant, loadConfig, navigate, withTenant, fetchJSON, getAPI, loadComponent, fileToBase64, mostrarToast, sha256File }
 
 function getAPI() {
   return CONFIG.ENVIRONMENT === "development"
@@ -62,6 +62,7 @@ async function fetchJSON(caminho, tenant = "default", dados = {}) {
   const url = `${getAPI()}/api/${CONFIG.VERSION}/${caminho}`
 
   const controller = new AbortController()
+
   const timeout = setTimeout(() => controller.abort(), 10000)
 
   try {
@@ -134,6 +135,30 @@ async function fetchJSON(caminho, tenant = "default", dados = {}) {
   }
 }
 
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result.split(",")[1]);
+    };
+
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function sha256File(file) {
+    const buffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+
+    return [...new Uint8Array(hashBuffer)]
+        .map(b => b.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+
+
 // =====================================================
 // LOAD CONFIG
 // =====================================================
@@ -194,7 +219,6 @@ async function loadConfig() {
           content: dec.content || {}
         })
 
-        console.error( defaultConfig )
       }
     } catch (e) {
       console.error("decrypt default falhou", e)
@@ -325,7 +349,9 @@ function mergeArray(base = [], override = [], key) {
 // =====================================================
 
 async function loadTenantCSS() {
+  
   const id = "tenant-style"
+  
   document.getElementById(id)?.remove()
 
   const link = document.createElement("link")
@@ -337,7 +363,7 @@ async function loadTenantCSS() {
 
   try {
     const res = await fetch(tenantCSS, { method: "HEAD" })
-    link.href = res.ok ? tenantCSS : defaultCSS
+    link.href = res.ok ? tenantCSS : ""
   } catch {
     link.href = defaultCSS
   }
@@ -596,6 +622,24 @@ export async function router() {
 
   currentView = view
   await render(view, r, params, ctx)
+}
+
+function mostrarToast(mensagem, posicao = "top-right", quem) {
+
+    const toast = document.getElementById( quem );
+
+    toast.textContent = mensagem;
+
+    // Remove posições anteriores
+    toast.className = "toast";
+
+    // Define nova posição
+    toast.classList.add(posicao);
+
+    // Reinicia animação
+    toast.classList.remove("show");
+    void toast.offsetWidth;
+    toast.classList.add("show");
 }
 
 // =====================================================

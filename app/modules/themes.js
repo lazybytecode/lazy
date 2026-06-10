@@ -56,9 +56,13 @@ export async function applyTheme() {
 
     const root = document.documentElement
 
+    root.removeAttribute('style');
+
     root.setAttribute( 'data-theme', theme );
 
     root.setAttribute( 'data-tenant', tenant );
+
+    root.setAttribute( 'id', tenant );
 
     root.style.transition = "background-color 0.3s ease, color 0.3s ease";
 
@@ -77,39 +81,6 @@ export async function applyTheme() {
     themeDepth--
   }
 }
-
-// export async function applyTheme() {
-  
-//   const { theme } = getState();
-
-//   const themes = await loadConfig()
-
-//   const root = document.documentElement;
-
-//   const themeConfig = themes['theme'][theme];
-
-//   if (!themeConfig) return;
-
-//   const tenant = getTenant()
-
-//   document.documentElement.dataset.tenant = tenant
-
-//   // 🔥 aplica atributos
-//   root.setAttribute("data-theme", theme);
-
-//   // 🔥 transição suave
-//   root.style.transition = "background-color 0.3s ease, color 0.3s ease";
-
-//   // 🔥 aplica TODAS as variáveis do JSON como CSS variables
-//   Object.entries(themeConfig).forEach(([key, value]) => {
-//     root.style.setProperty(`--${key}`, value);
-//   });
-
-//   // 🔥 limpa transition depois
-//   setTimeout(() => {
-//     root.style.transition = "";
-//   }, 400);
-// }
 
 /**
  * Inicialização do sistema de tema

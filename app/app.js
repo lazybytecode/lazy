@@ -28,10 +28,10 @@ async function initApp() {
       setState({ theme: "light" })
     }
 
-    applyTheme()
+    await applyTheme()
 
     subscribe(() => {
-      applyTheme()
+        applyTheme()
     })
 
 }
