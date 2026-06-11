@@ -169,119 +169,138 @@ let loadingConfigPromise = null
 
 async function loadConfig() {
 
-  if (loadingConfigPromise) return loadingConfigPromise
+  const res = await fetchJSON("themes", tenant)
 
-  loadingConfigPromise = (async () => {
+  const dec = await decrypt_response(
+    res.payload,
+    res.clientKeys,
+    res.tenantId
+  )
 
-    const promises = [fetchJSON("themes", "default")]
+  config = normalizeConfig({
+    theme: dec.theme || {},
+    routes: dec.routes || [],
+    content: dec.content || {}
+  })
 
-    if (tenant !== "default") {
-      promises.push(fetchJSON("themes", tenant))
-    }
-
-    const res = await Promise.allSettled(promises)
-
-    const defaultRaw =
-      res[0]?.status === "fulfilled" ? res[0].value : null
-
-    const tenantRaw =
-      tenant !== "default" && res[1]?.status === "fulfilled"
-        ? res[1].value
-        : null
-
-    let defaultConfig = normalizeConfig({ theme: {}, routes: [], content: {} })
-
-    try {
-      if (!defaultRaw?.payload) {
-        console.warn("defaultRaw sem payload — usando fallback vazio")
-      } else {
-        if (!defaultRaw.payload?.ciphertext) {
-          throw new Error("Payload default inválido")
-        }
-
-        // BUG CORRIGIDO: usava cria_chaves() aqui gerando um par de chaves NOVO,
-        // diferente do par usado no fetchJSON(). O shared secret derivado via ECDH
-        // depende da chave privada do cliente — se ela mudar entre o request e o
-        // decrypt, o AES-GCM falha. Agora reutiliza defaultRaw.clientKeys.
-        const dec = await decrypt_response(
-          defaultRaw.payload,
-          defaultRaw.clientKeys,
-          defaultRaw.tenantId
-        )
-
-        if (!dec || typeof dec !== "object") {
-          throw new Error("Decrypt retornou inválido")
-        }
-
-        defaultConfig = normalizeConfig({
-          theme: dec.theme || {},
-          routes: Array.isArray(dec.routes) ? dec.routes : [],
-          content: dec.content || {}
-        })
-
-      }
-    } catch (e) {
-      console.error("decrypt default falhou", e)
-      defaultConfig = normalizeConfig({ theme: {}, routes: [], content: {} })
-    }
-
-    let tenantConfig = defaultConfig
-
-    try {
-      if (tenantRaw?.payload) {
-        // BUG CORRIGIDO: mesmo problema — reutiliza tenantRaw.clientKeys
-        const dec = await decrypt_response(
-          tenantRaw.payload,
-          tenantRaw.clientKeys,
-          tenantRaw.tenantId
-        )
-
-        const normalized = normalizeConfig({
-          theme: dec?.theme || {},
-          routes: Array.isArray(dec?.routes) ? dec.routes : [],
-          content: dec?.content || {}
-        })
-
-        const hasOwnConfig =
-          normalized.routes.length > 0 ||
-          Object.keys(normalized.theme).length > 0 ||
-          Object.keys(normalized.content).length > 0
-
-        tenantConfig = hasOwnConfig ? normalized : defaultConfig
-      }
-    } catch (e) {
-      console.error("decrypt tenant falhou", e)
-      tenantConfig = defaultConfig
-    }
-
-    if (!defaultConfig || !Array.isArray(defaultConfig.routes)) {
-      console.error("DEFAULT CONFIG INVÁLIDA:", defaultConfig)
-      defaultConfig = normalizeConfig({ theme: {}, routes: [], content: {} })
-    }
-
-    let finalConfig
-
-    if (tenant === "default") {
-      finalConfig = {
-        ...defaultConfig,
-        __base: structuredClone(defaultConfig)
-      }
-    } else {
-      finalConfig = mergeConfig(defaultConfig, tenantConfig)
-      finalConfig.__base = structuredClone(defaultConfig)
-    }
-
-    config = finalConfig
-    return config
-
-  })()
-
-  try {
-    return await loadingConfigPromise
-  } finally {
-    loadingConfigPromise = null
-  }
+  return config
 }
+
+// async function loadConfig() {
+
+//   if (loadingConfigPromise) return loadingConfigPromise
+
+//   loadingConfigPromise = (async () => {
+
+//     const promises = [fetchJSON("themes", tenant)]
+
+//     if (tenant !== "default") {
+//       promises.push(fetchJSON("themes", tenant))
+//     }
+
+//     const res = await Promise.allSettled(promises)
+
+//     const defaultRaw =
+//       res[0]?.status === "fulfilled" ? res[0].value : null
+
+//     const tenantRaw =
+//       tenant !== "default" && res[1]?.status === "fulfilled"
+//         ? res[1].value
+//         : null
+
+//     let defaultConfig = normalizeConfig({ theme: {}, routes: [], content: {} })
+
+//     try {
+//       if (!defaultRaw?.payload) {
+//         console.warn("defaultRaw sem payload — usando fallback vazio")
+//       } else {
+//         if (!defaultRaw.payload?.ciphertext) {
+//           throw new Error("Payload default inválido")
+//         }
+
+//         // BUG CORRIGIDO: usava cria_chaves() aqui gerando um par de chaves NOVO,
+//         // diferente do par usado no fetchJSON(). O shared secret derivado via ECDH
+//         // depende da chave privada do cliente — se ela mudar entre o request e o
+//         // decrypt, o AES-GCM falha. Agora reutiliza defaultRaw.clientKeys.
+//         const dec = await decrypt_response(
+//           defaultRaw.payload,
+//           defaultRaw.clientKeys,
+//           defaultRaw.tenantId
+//         )
+
+//         if (!dec || typeof dec !== "object") {
+//           throw new Error("Decrypt retornou inválido")
+//         }
+
+//         defaultConfig = normalizeConfig({
+//           theme: dec.theme || {},
+//           routes: Array.isArray(dec.routes) ? dec.routes : [],
+//           content: dec.content || {}
+//         })
+
+//       }
+//     } catch (e) {
+//       console.error("decrypt default falhou", e)
+//       defaultConfig = normalizeConfig({ theme: {}, routes: [], content: {} })
+//     }
+
+//     let tenantConfig = defaultConfig
+
+//     try {
+//       if (tenantRaw?.payload) {
+//         // BUG CORRIGIDO: mesmo problema — reutiliza tenantRaw.clientKeys
+//         const dec = await decrypt_response(
+//           tenantRaw.payload,
+//           tenantRaw.clientKeys,
+//           tenantRaw.tenantId
+//         )
+
+//         const normalized = normalizeConfig({
+//           theme: dec?.theme || {},
+//           routes: Array.isArray(dec?.routes) ? dec.routes : [],
+//           content: dec?.content || {}
+//         })
+
+//         const hasOwnConfig =
+//           normalized.routes.length > 0 ||
+//           Object.keys(normalized.theme).length > 0 ||
+//           Object.keys(normalized.content).length > 0
+
+//         tenantConfig = hasOwnConfig ? normalized : defaultConfig
+//       }
+//     } catch (e) {
+//       console.error("decrypt tenant falhou", e)
+//       tenantConfig = defaultConfig
+//     }
+
+//     if (!defaultConfig || !Array.isArray(defaultConfig.routes)) {
+//       console.error("DEFAULT CONFIG INVÁLIDA:", defaultConfig)
+//       defaultConfig = normalizeConfig({ theme: {}, routes: [], content: {} })
+//     }
+
+//     let finalConfig
+
+//     if (tenant === "default") {
+//       finalConfig = {
+//         ...defaultConfig,
+//         __base: structuredClone(defaultConfig)
+//       }
+//     } else {
+//       finalConfig = mergeConfig(defaultConfig, tenantConfig)
+//       finalConfig.__base = structuredClone(defaultConfig)
+//     }
+
+//     config = finalConfig
+//     return config
+
+//   })()
+
+//   try {
+//     return await loadingConfigPromise
+//   } finally {
+//     loadingConfigPromise = null
+//   }
+// }
 
 // =====================================================
 // HELPERS

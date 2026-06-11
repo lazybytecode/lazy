@@ -38,8 +38,8 @@ function base64ToBytes(b64) {
 // =====================================================
 
 async function importServerPublicKey() {
-    const pem = CONFIG.PUBLIC_KEY
-    .replace(/\\n/g, "\n")
+  
+  const pem = SERVER_SIGN_PUBLIC_PEM
     .replace("-----BEGIN PUBLIC KEY-----", "")
     .replace("-----END PUBLIC KEY-----", "")
     .replace(/\s/g, "")
@@ -77,6 +77,7 @@ function importECDHPublicKey(server_pub) {
 // =====================================================
 
 function canonicalMessage(payload, tenantId) {
+ // console.log("tenantId:", JSON.stringify(tenantId))
   return [
     payload.v,
     payload.timestamp,
@@ -168,6 +169,7 @@ export async function decrypt_response(payload, clientKeys, tenantId) {
   // BUG CORRIGIDO: usava verifySignature() com ECDSA internamente (já corrigida),
   // mas o bloco inline abaixo também estava duplicado e era redundante.
   // Agora usa apenas verifySignature() unificado.
+
   await verifySignature(payload, signKey, tenantId)
 
   // =====================================================
