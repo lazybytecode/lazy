@@ -68,9 +68,9 @@ export async function applyTheme() {
 
     const themeName = theme; 
 
-    // Object.entries(themes.theme[themeName]).forEach(([key, value]) => {
-    //   root.style.setProperty(`--${key}`, value);
-    // });
+    Object.entries(themes.theme[themeName]).forEach(([key, value]) => {
+      root.style.setProperty(`--${key}`, value);
+    });
 
     setTimeout(() => {
       root.style.transition = ""
