@@ -1,5 +1,4 @@
-import { dashboardPage } from "../pages/dashboardPage.js"
-import { setupEtlPage } from "../pages/setupEtlPage.js"
+import { withTenant } from "../../../router.js";
 
 function injectStyles() {
   if (!document.getElementById("dash-petai-styles")) {
@@ -1019,259 +1018,59 @@ canvas{
   }
 }
 
-const routes = {
-    "dashboard":  dashboardPage,
-    "configuracoes": configuracaoPage,
-    "setup": setupEtlPage,
-};
+export function render(el, props = {}, content, config, ctx = {}) {
 
-function getBasePath() {
-    // Encontra a posição de "dashboard" e preserva até ele (inclusive)
-    const parts = window.location.pathname.split("/");
-    const dashIndex = parts.indexOf("dashboard");
-    if (dashIndex === -1) return window.location.pathname;
-    return parts.slice(0, dashIndex + 1).join("/"); // "/t/petai/dashboard"
-}
+    injectStyles()
 
-function getCurrentRoute() {
-  const parts = window.location.pathname.split("/");
-  const dashIndex = parts.indexOf("dashboard");
-  if (dashIndex === -1) return "dashboard";
-  const sub = parts[dashIndex + 1];
-  return sub && routes[sub] ? sub : "dashboard"; // valida se a rota existe
-}
+    el.innerHTML = ` 
+    
+    <aside id="sidebar" class="sidebar glass parallax" data-speed="0.08"></aside>
+    
+    <main id="conteudo" class="content">
 
-async function navigate(path, push = true) {
-    const container = document.getElementById("page-container");
-    const normalizedPath = path.replace(/^\/+|\/+$/g, "") || "dashboard";
-    const page = routes[normalizedPath];
+        <header class="topbar glass">
 
-    if (!page) {
-        container.innerHTML = "<h1>404 - Página não encontrada</h1>";
-        return;
+        <div>
+            <h1 id="titulo" >Dashboard</h1>
+            <span id="subtitulo">Visão geral da sua operação</span>
+        </div>
+
+        <div class="top-actions">
+
+            <div class="search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Buscar..." />
+            </div>
+
+            <button class="icon-btn">
+            <i class="fa-regular fa-bell"></i>
+            </button>
+
+            <div class="profile">
+            <img src="https://i.pravatar.cc/100" alt="">
+            <div>
+                <strong>Pet Shop Exemplo</strong>
+                <small>Administrador</small>
+            </div>
+            </div>
+
+        </div>
+
+        </header>
+
+        <div id="page-container"></div>
+
+    </main> 
+    `
+
+    document.querySelectorAll("a[data-route]").forEach(link => {
+        link.href = withTenant(link.getAttribute("href"))
+    })
+
+    return {
+        slots: {
+            sidebar: el.querySelector("#sidebar"),
+            main: el.querySelector("#conteudo")
+        }
     }
-
-    if (push) {
-        const basePath = getBasePath();
-        // /t/petai/dashboard  →  rota raiz (sem subpath)
-        // /t/petai/dashboard/configuracoes  →  subrota
-        const url = normalizedPath === "dashboard"
-            ? basePath
-            : `${basePath}/${normalizedPath}`;
-        history.pushState({ path: normalizedPath }, "", url);
-    }
-
-    await page(container);
-
-    // garante que o DOM está estável antes de marcar o menu
-    requestAnimationFrame(() => updateActiveMenu(normalizedPath));
-    requestAnimationFrame(() => disparo( path ));
-}
-
-/* =========================================================
-   Páginas do Dashboard
-========================================================= */
-
-
-
-async function vendasPage(container) {
-    container.innerHTML = `
-        <h1>Vendas</h1>
-        <div class="panel glass">
-            Relatório de vendas
-        </div>
-    `;
-}
-
-async function produtosPage(container) {
-    container.innerHTML = `
-        <h1>Produtos</h1>
-        <div class="panel glass">
-            Lista de produtos
-        </div>
-    `;
-}
-
-async function estoquePage(container) {
-    container.innerHTML = `
-        <h1>Estoque</h1>
-        <div class="panel glass">
-            Controle de estoque
-        </div>
-    `;
-}
-
-async function configuracaoPage(container) {
-  document.getElementById("titulo").innerHTML = 'Configurações'
-  document.getElementById("subtitulo").innerHTML = 'Ajustes e aparência do sistema'
-  container.innerHTML = `
-      <div class="panel glass">
-        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
-          <svg class="sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-      </div>
-  `;
-}
-
-function updateActiveMenu(path = "dashboard") {
-
-    path = path.replace(/^\/+|\/+$/g, "");
-
-    document.querySelectorAll(".menu a").forEach(link => {
-        link.classList.toggle(
-            "active",
-            link.dataset.route === path
-        );
-    });
-}
-
-export async function render(el, props = {}, content, config, ctx = {}) {
-
-  injectStyles()
-
-  el.innerHTML = `
-
-   <div class="bg-gradient"></div>
-
-    <aside class="sidebar glass parallax" data-speed="0.08">
-
-    <div class="logo">
-        <div class="logo-icon">🐾</div>
-        <span>PetAI</span>
-      </div>
-
-    <nav class="menu">
-
-      <a href="#" data-route="dashboard">
-        <i class="fa-solid fa-house"></i>
-        Dashboard
-      </a>
-
-      <a href="#" data-route="setup" >
-        <i class="fa-solid fa-chart-line"></i>
-        ETL Guiado
-      </a>
-
-      <a href="#" data-route="configuracoes">
-          <i class="fa-solid fa-gear"></i>
-          Configurações
-      </a>
-
-      
-
-      <a href="#">
-        <i class="fa-solid fa-box"></i>
-        Produtos
-      </a>
-
-      <a href="#">
-        <i class="fa-solid fa-warehouse"></i>
-        Estoque
-      </a>
-
-      <a href="#">
-        <i class="fa-solid fa-users"></i>
-        Clientes
-      </a>
-
-      <a href="#">
-        <i class="fa-solid fa-file-lines"></i>
-        Relatórios
-      </a>
-
-      <a href="#">
-        <i class="fa-solid fa-bell"></i>
-        Alertas
-      </a>
-
-      <a href="#">
-        <i class="fa-solid fa-plug"></i>
-        Integrações
-      </a>
-
-    </nav>
-
-    <div class="support-card">
-      <h3>Dúvidas?</h3>
-      <p>Fale com nosso suporte especialista.</p>
-
-      <img
-        src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?q=80&w=500"
-        alt=""
-      />
-
-      <button>Abrir chamado</button>
-    </div>
-
-  </aside>
-
-  <main class="content">
-
-    <header class="topbar glass">
-
-      <div>
-        <h1 id="titulo" >Dashboard</h1>
-        <span id="subtitulo">Visão geral da sua operação</span>
-      </div>
-
-      <div class="top-actions">
-
-        <div class="search">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Buscar..." />
-        </div>
-
-        <button class="icon-btn">
-          <i class="fa-regular fa-bell"></i>
-        </button>
-
-        <div class="profile">
-          <img src="https://i.pravatar.cc/100" alt="">
-          <div>
-            <strong>Pet Shop Exemplo</strong>
-            <small>Administrador</small>
-          </div>
-        </div>
-
-      </div>
-
-    </header>
-
-    <div id="page-container"></div>
-
-  </main> 
-  `
-
-  document.getElementById("page-container").innerHTML = ""
-
-  el.addEventListener("click", (e) => {
-    const link = e.target.closest("a[data-route]");
-    if (!link) return;
-    e.preventDefault();
-    e.stopPropagation();
-    navigate(link.dataset.route, true);
-
-  });
-
-  window.addEventListener("popstate", async (e) => {
-    const route = e.state?.path || getCurrentRoute();
-    await navigate(route, false);
-  });
-
-  // ✅ Lê a rota da URL no momento do carregamento (F5, link direto)
-  const initialRoute = getCurrentRoute();
-  await navigate(initialRoute, false);
-
-}
-
-async function disparo( rota )
-{
-  switch( rota ){
-    case "dashboard": dashboardPage()
-    break
-
-    case "setup": console.log("setup")
-    break
-  }
 }

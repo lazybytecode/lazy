@@ -42,7 +42,15 @@ function getTenant() {
 function getTenantFromPath() {
   const parts = location.pathname.split("/")
   if (parts[1] === "t" && parts[2]) return parts[2]
-  return "default"
+  throw new Error(
+    "Tenant não informado na URL"
+  )
+  return null
+  //return "default"
+}
+
+if (!tenant) {
+  throw new Error("Tenant inválido")
 }
 
 // =====================================================
@@ -157,8 +165,6 @@ async function sha256File(file) {
         .join("");
 }
 
-
-
 // =====================================================
 // LOAD CONFIG
 // =====================================================
@@ -185,122 +191,6 @@ async function loadConfig() {
 
   return config
 }
-
-// async function loadConfig() {
-
-//   if (loadingConfigPromise) return loadingConfigPromise
-
-//   loadingConfigPromise = (async () => {
-
-//     const promises = [fetchJSON("themes", tenant)]
-
-//     if (tenant !== "default") {
-//       promises.push(fetchJSON("themes", tenant))
-//     }
-
-//     const res = await Promise.allSettled(promises)
-
-//     const defaultRaw =
-//       res[0]?.status === "fulfilled" ? res[0].value : null
-
-//     const tenantRaw =
-//       tenant !== "default" && res[1]?.status === "fulfilled"
-//         ? res[1].value
-//         : null
-
-//     let defaultConfig = normalizeConfig({ theme: {}, routes: [], content: {} })
-
-//     try {
-//       if (!defaultRaw?.payload) {
-//         console.warn("defaultRaw sem payload — usando fallback vazio")
-//       } else {
-//         if (!defaultRaw.payload?.ciphertext) {
-//           throw new Error("Payload default inválido")
-//         }
-
-//         // BUG CORRIGIDO: usava cria_chaves() aqui gerando um par de chaves NOVO,
-//         // diferente do par usado no fetchJSON(). O shared secret derivado via ECDH
-//         // depende da chave privada do cliente — se ela mudar entre o request e o
-//         // decrypt, o AES-GCM falha. Agora reutiliza defaultRaw.clientKeys.
-//         const dec = await decrypt_response(
-//           defaultRaw.payload,
-//           defaultRaw.clientKeys,
-//           defaultRaw.tenantId
-//         )
-
-//         if (!dec || typeof dec !== "object") {
-//           throw new Error("Decrypt retornou inválido")
-//         }
-
-//         defaultConfig = normalizeConfig({
-//           theme: dec.theme || {},
-//           routes: Array.isArray(dec.routes) ? dec.routes : [],
-//           content: dec.content || {}
-//         })
-
-//       }
-//     } catch (e) {
-//       console.error("decrypt default falhou", e)
-//       defaultConfig = normalizeConfig({ theme: {}, routes: [], content: {} })
-//     }
-
-//     let tenantConfig = defaultConfig
-
-//     try {
-//       if (tenantRaw?.payload) {
-//         // BUG CORRIGIDO: mesmo problema — reutiliza tenantRaw.clientKeys
-//         const dec = await decrypt_response(
-//           tenantRaw.payload,
-//           tenantRaw.clientKeys,
-//           tenantRaw.tenantId
-//         )
-
-//         const normalized = normalizeConfig({
-//           theme: dec?.theme || {},
-//           routes: Array.isArray(dec?.routes) ? dec.routes : [],
-//           content: dec?.content || {}
-//         })
-
-//         const hasOwnConfig =
-//           normalized.routes.length > 0 ||
-//           Object.keys(normalized.theme).length > 0 ||
-//           Object.keys(normalized.content).length > 0
-
-//         tenantConfig = hasOwnConfig ? normalized : defaultConfig
-//       }
-//     } catch (e) {
-//       console.error("decrypt tenant falhou", e)
-//       tenantConfig = defaultConfig
-//     }
-
-//     if (!defaultConfig || !Array.isArray(defaultConfig.routes)) {
-//       console.error("DEFAULT CONFIG INVÁLIDA:", defaultConfig)
-//       defaultConfig = normalizeConfig({ theme: {}, routes: [], content: {} })
-//     }
-
-//     let finalConfig
-
-//     if (tenant === "default") {
-//       finalConfig = {
-//         ...defaultConfig,
-//         __base: structuredClone(defaultConfig)
-//       }
-//     } else {
-//       finalConfig = mergeConfig(defaultConfig, tenantConfig)
-//       finalConfig.__base = structuredClone(defaultConfig)
-//     }
-
-//     config = finalConfig
-//     return config
-
-//   })()
-
-//   try {
-//     return await loadingConfigPromise
-//   } finally {
-//     loadingConfigPromise = null
-//   }
-// }
 
 // =====================================================
 // HELPERS
@@ -368,27 +258,52 @@ function mergeArray(base = [], override = [], key) {
 // =====================================================
 
 async function loadTenantCSS() {
-  
   const id = "tenant-style"
-  
+
   document.getElementById(id)?.remove()
+
+  const tenantCSS = `/tenants/${tenant}/theme.css`
+
+  const res = await fetch(tenantCSS, {
+    method: "HEAD"
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `CSS do tenant '${tenant}' não encontrado`
+    )
+  }
 
   const link = document.createElement("link")
   link.id = id
   link.rel = "stylesheet"
-
-  const tenantCSS = `/tenants/${tenant}/theme.css`
-  const defaultCSS = `/tenants/default/theme.css`
-
-  try {
-    const res = await fetch(tenantCSS, { method: "HEAD" })
-    link.href = res.ok ? tenantCSS : ""
-  } catch {
-    link.href = defaultCSS
-  }
+  link.href = tenantCSS
 
   document.head.appendChild(link)
 }
+
+// async function loadTenantCSS() {
+  
+//   const id = "tenant-style"
+  
+//   document.getElementById(id)?.remove()
+
+//   const link = document.createElement("link")
+//   link.id = id
+//   link.rel = "stylesheet"
+
+//   const tenantCSS = `/tenants/${tenant}/theme.css`
+//   const defaultCSS = `/tenants/default/theme.css`
+
+//   try {
+//     const res = await fetch(tenantCSS, { method: "HEAD" })
+//     link.href = res.ok ? tenantCSS : ""
+//   } catch {
+//     link.href = defaultCSS
+//   }
+
+//   document.head.appendChild(link)
+// }
 
 // =====================================================
 // INIT
@@ -446,14 +361,23 @@ function navigate(url) {
 function match(path) {
   for (const r of config.routes) {
     const keys = []
+
     const pattern = r.path.replace(/:([^/]+)/g, (_, k) => {
       keys.push(k)
       return "([^/]+)"
     })
-    const m = path.match(new RegExp("^" + pattern + "$"))
+
+    const m = path.match(
+      new RegExp("^" + pattern + "/?$")
+    )
+
     if (!m) continue
+
     const params = {}
-    keys.forEach((k, i) => { params[k] = m[i + 1] })
+    keys.forEach((k, i) => {
+      params[k] = m[i + 1]
+    })
+
     return { r, params }
   }
 }
@@ -472,10 +396,13 @@ const cache = {}
 async function loadComponent(name) {
   if (cache[name]) return cache[name]
 
+  // const paths = [
+  //   `/tenants/${tenant}/components/${name}.js`,
+  //   `/tenants/default/components/${name}.js`,
+  //   `/components/${name}.js`
+  // ]
   const paths = [
-    `/tenants/${tenant}/components/${name}.js`,
-    `/tenants/default/components/${name}.js`,
-    `/components/${name}.js`
+    `/tenants/${tenant}/components/${name}.js`
   ]
 
   for (const p of paths) {
@@ -486,15 +413,23 @@ async function loadComponent(name) {
     }
   }
 
+  throw new Error(
+    `Componente '${name}' não encontrado no tenant '${tenant}'`
+  )
+
   console.warn(`[Component not found] ${name}`)
   return { render: () => {} }
 }
 
 async function loadView(view) {
+  
+  // const paths = [
+  //   `/tenants/${tenant}/views/${view}.js`,
+  //   `/tenants/default/views/${view}.js`,
+  //   `/views/${view}.js`
+  // ]
   const paths = [
-    `/tenants/${tenant}/views/${view}.js`,
-    `/tenants/default/views/${view}.js`,
-    `/views/${view}.js`
+    `/tenants/${tenant}/views/${view}.js`
   ]
 
   for (const p of paths) {
@@ -502,12 +437,21 @@ async function loadView(view) {
     if (mod) return mod
   }
 
+  throw new Error(
+    `View '${view}' não encontrada no tenant '${tenant}'`
+  )
+
   console.warn(`[View not found] ${view}`)
   return { render: () => {} }
 }
 
 function getPageConfig(view) {
+  return config.content?.[view] || {}
+}
+
+function getPageConfigHeranca(view) {
   const currentPage = config.content?.[view]
+  
   const basePage = config.__base?.content?.[view]
 
   if (currentPage) {
@@ -552,7 +496,11 @@ async function renderContentUI(view, config, route, ctx = {}) {
     let componentName = item.component
 
     if (item.resolver?.type === "route") {
-      const key = route?.resolverKey
+      
+      const key = location.pathname
+        .replace(`/t/${tenant}`, "")
+        .replace(/^\//, "")
+
       if (key && item.resolver.map?.[key]) {
         componentName = item.resolver.map[key]
       }
@@ -605,6 +553,11 @@ export async function router() {
     path = path.replace(`/t/${tenant}`, "") || "/"
   }
 
+  // remove barra final
+  if (path.length > 1 && path.endsWith("/")) {
+    path = path.slice(0, -1)
+  }
+
   const matchResult = match(path)
 
   if (!matchResult) {
@@ -616,7 +569,24 @@ export async function router() {
       return
     }
 
-    return navigate(fallback)
+    //return navigate(fallback)
+    if (!matchResult) {
+      console.error(`Rota não encontrada: ${path}`)
+
+      currentView = "404"
+
+      await render(
+        "404",
+        {},
+        {},
+        {
+          path
+        }
+      )
+
+      return
+    }
+    
   }
 
   const { r, params } = matchResult
@@ -635,12 +605,29 @@ export async function router() {
 
   const view = r.view
 
+  const routeKey = `${view}:${JSON.stringify(params)}:${location.search}`
+
+  // if (currentView === routeKey) {
+  //   return renderContentUI(view, config, r, {
+  //     ...ctx,
+  //     isUpdate: true
+  //   })
+  // }
+
+  currentView = routeKey
+
   if (currentView === view) {
     return renderContentUI(view, config, r, { ...ctx, isUpdate: true })
   }
 
   currentView = view
+
   await render(view, r, params, ctx)
+
+  
+
+  
+  // await render(view, r, params, ctx)
 }
 
 function mostrarToast(mensagem, posicao = "top-right", quem) {

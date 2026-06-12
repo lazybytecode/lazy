@@ -35,7 +35,6 @@ export function setState(partial) {
 
   listeners.forEach(fn => fn(state, prev));
 
-  //console.log("[STATE UPDATED]", state);
 }
 
 /**
