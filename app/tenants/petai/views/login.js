@@ -1,3 +1,6 @@
+import { fetchJSON, getTenant, withTenant } from "../../../router.js";
+import { decrypt_response } from "../../../modules/crypto.js"
+
 function injectStyles() {
   if (!document.getElementById("login-petai-styles")) {
     const style = document.createElement("style");
@@ -9,14 +12,15 @@ function injectStyles() {
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root{
-  --bg:#f1f1f1;
+  --bg:#f4f4f4;
   --card:#ffffff14;
   --border:#ffffff22;
   --text:#f7f9fc;
   --muted:#b9c4d6;
   --green:#34d46a;
   --green-dark:#22b956;
-  --input:#ffffff10;
+  --input:#f7f7f7;
+  --gradiente: linear-gradient(135deg,#34d46a,#22b956);
 }
 
 *{
@@ -114,7 +118,7 @@ body{
 
   border-radius:999px;
 
-  background:#ffffff10;
+  background: rgba( 255,255,255, 0.4);
   border:1px solid #ffffff;
 
   margin-bottom:24px;
@@ -150,7 +154,7 @@ body{
 
 .features div{
 
-  background:#ffffff10;
+  background: rgba( 255,255,255, 0.4);
   border:1px solid #ffffff;
 
   padding:20px;
@@ -237,7 +241,7 @@ body{
   flex:1;
   border:none;
 
-  background:transparent;
+  background: #f4f4f4;
 
   padding:16px;
 
@@ -251,11 +255,13 @@ body{
 
   transition:.35s;
 
+  margin-left: 1rem;
+
 }
 
 .toggle-btn.active{
 
-  background:linear-gradient(135deg,#34d46a,#22b956);
+  background: var( --gradiente );
 
 }
 
@@ -484,6 +490,21 @@ body{
   }
 
 }
+
+h1 span, 
+h2 span
+{
+    color: var(--primary);
+    font-style: italic;
+    font-size: 1.1em;
+
+}
+
+.auth-container 
+{
+    background: #fff;
+}
+
     
     `;
     document.head.appendChild(style);
@@ -610,35 +631,59 @@ function login()
 
     document.querySelectorAll('form').forEach(form=>{
 
-    form.addEventListener('submit',(e)=>{
+    form.addEventListener('submit',async (e)=>{
 
         e.preventDefault();
 
-        const btn =
-        form.querySelector('.submit-btn');
+        const btn = form.querySelector('.submit-btn');
 
-        btn.innerHTML =
-        '<i class="fa-solid fa-spinner fa-spin"></i>';
+        const tenant = getTenant()
 
-        setTimeout(()=>{
+        if ( btn.id == "register" )
+        {
+          const dados = { }
+          const res = await fetchJSON( 'sso/register', tenant, dados )
+          
+          let resp = await decrypt_response( res.payload, res.clientKeys, res.tenantId )
 
-        btn.innerHTML = 'Sucesso ✓';
+          btn_animado( btn, resp.mensagem, resp.next )
 
-        setTimeout(()=>{
-
-            location.reload();
-
-        },1000);
-
-        },1200);
+        }
+        else
+        {
+          const dados = { }
+          const res = await fetchJSON( 'sso/login', tenant, dados )
+        }
 
     });
 
     });
 }
 
+function btn_animado( btn, mensagem = "Falha x", next ){
+  
+  btn.innerHTML =
+
+        '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+        setTimeout(()=>{
+
+        btn.innerHTML = mensagem;
+
+        setTimeout(()=>{
+
+          if( next != "")
+          {
+            location.href  = withTenant( next )
+          }
+
+        },1000);
+
+        },1200);
+}
+
 export function render(el, props = {}, content, config, ctx = {}) {
-    
+
     injectStyles()
     
     el.innerHTML = `
@@ -656,7 +701,7 @@ export function render(el, props = {}, content, config, ctx = {}) {
           🐾
         </div>
 
-        <h1>PetAI</h1>
+        <h1>Pet<span>AI</span></h1>
 
       </div>
 
@@ -667,7 +712,7 @@ export function render(el, props = {}, content, config, ctx = {}) {
         </span>
 
         <h2>
-          Controle, gestão e inteligência para o seu negócio.
+          Controle, gestão e inteligência para o <span> seu negócio </span>.
         </h2>
 
         <p>
@@ -700,6 +745,16 @@ export function render(el, props = {}, content, config, ctx = {}) {
 
     <!-- RIGHT -->
     <section class="auth-container glass">
+
+      <div class="brand" style="margin: 3rem auto; position: relative;" >
+
+        <div class="logo">
+          🐾
+        </div>
+
+        <h1>Pet<span>AI</span></h1>
+
+      </div>
 
       <!-- TOGGLE -->
       <div class="toggle-wrapper">
@@ -840,8 +895,8 @@ export function render(el, props = {}, content, config, ctx = {}) {
 
         </div>
 
-        <button class="submit-btn">
-          Criar conta
+        <button id="register" class="submit-btn">
+          Criar Conta
         </button>
 
       </form>
@@ -887,5 +942,9 @@ export function render(el, props = {}, content, config, ctx = {}) {
     `;
 
     login()
+
+    document.querySelectorAll("a[data-route]").forEach(link => {
+        link.href = withTenant(link.getAttribute("href"))
+    })
     
 }

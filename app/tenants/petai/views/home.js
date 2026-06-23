@@ -1,3 +1,5 @@
+import { withTenant } from "../../../router.js";
+
 function petAI()
 {
   const reveals = document.querySelectorAll('.reveal');
@@ -107,7 +109,7 @@ export function render(el, props = {}, content, config, ctx = {}) {
       </nav>
 
       <div class="nav-actions">
-        <button class="btn btn-outline">Entrar</button>
+        <a href="/login" data-route="/login" class="btn btn-outline">Entrar</a>
         <button class="btn btn-primary">Começar teste grátis</button>
       </div>
 
@@ -391,6 +393,10 @@ export function render(el, props = {}, content, config, ctx = {}) {
 
   `
     petAI()
+
+    document.querySelectorAll("a[data-route]").forEach(link => {
+        link.href = withTenant(link.getAttribute("href"))
+    })
 
   return {
     slots: {}

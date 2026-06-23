@@ -2,7 +2,8 @@ import { CONFIG } from "./config.js"
 
 import { cria_chaves, decrypt_response } from "./modules/crypto.js"
 
-export { getTenant, loadConfig, navigate, withTenant, fetchJSON, getAPI, loadComponent, fileToBase64, mostrarToast, sha256File }
+export { getTenant, loadConfig, navigate, withTenant, fetchJSON, getAPI, loadComponent, fileToBase64, mostrarToast, sha256File, showLoader,
+  hideLoader }
 
 function getAPI() {
   return CONFIG.ENVIRONMENT === "development"
@@ -15,6 +16,12 @@ function getAPI() {
 // =====================================================
 
 const tenant = getTenant()
+
+const activeLoaders = new Map()
+
+let routerLoading = false
+
+const nonce = crypto.randomUUID()
 
 function getTenant() {
   const host = location.hostname
@@ -61,7 +68,12 @@ let config
 
 const STORAGE_KEY = (tenant) => `theme_config_${tenant}`
 
-async function fetchJSON(caminho, tenant = "default", dados = {}) {
+async function fetchJSON(
+    caminho,
+    tenant = "default",
+    dados = {},
+    loaderTarget = null
+){
 
   const { clientKeys, clientPubB64 } = await cria_chaves(tenant)
 
@@ -73,7 +85,12 @@ async function fetchJSON(caminho, tenant = "default", dados = {}) {
 
   const timeout = setTimeout(() => controller.abort(), 10000)
 
+  const nonce = crypto.randomUUID()
+
   try {
+
+    showLoader(loaderTarget)
+
     const res = await fetch(url, {
       method: "POST",
       signal: controller.signal,
@@ -84,6 +101,7 @@ async function fetchJSON(caminho, tenant = "default", dados = {}) {
       body: JSON.stringify({
         v: CONFIG.VERSION,
         timestamp,
+        nonce,
         client_pub: clientPubB64,
         dados,
         tenant_id: tenant,
@@ -139,6 +157,9 @@ async function fetchJSON(caminho, tenant = "default", dados = {}) {
     }
     throw e
   } finally {
+
+    hideLoader(loaderTarget)
+
     clearTimeout(timeout)
   }
 }
@@ -188,6 +209,8 @@ async function loadConfig() {
     routes: dec.routes || [],
     content: dec.content || {}
   })
+
+  console.log( dec )
 
   return config
 }
@@ -537,98 +560,192 @@ async function render(view, route, params, ctx) {
 }
 
 export async function router() {
-  if (!config || !config.routes) {
-    console.error("Router chamado sem config válida")
-    return
-  }
 
-  if (config.routes.length === 0) {
-    console.error("Nenhuma rota configurada — abortando router para evitar loop")
-    return
-  }
+  if (routerLoading) return
 
-  let path = location.pathname
+  routerLoading = true
 
-  if (path.startsWith(`/t/${tenant}`)) {
-    path = path.replace(`/t/${tenant}`, "") || "/"
-  }
+  showLoader()
 
-  // remove barra final
-  if (path.length > 1 && path.endsWith("/")) {
-    path = path.slice(0, -1)
-  }
+  try {
 
-  const matchResult = match(path)
-
-  if (!matchResult) {
-    const base = tenant !== "default" ? `/t/${tenant}` : ""
-    const fallback = base + "/"
-
-    if (location.pathname === fallback) {
-      console.error("Rota '/' não encontrada no config — verifique as rotas cadastradas")
+    if (!config || !config.routes) {
+      console.error("Router chamado sem config válida")
       return
     }
 
-    //return navigate(fallback)
+    if (config.routes.length === 0) {
+      console.error("Nenhuma rota configurada — abortando router para evitar loop")
+      return
+    }
+
+    let path = location.pathname
+
+    if (path.startsWith(`/t/${tenant}`)) {
+      path = path.replace(`/t/${tenant}`, "") || "/"
+    }
+
+    if (path.length > 1 && path.endsWith("/")) {
+      path = path.slice(0, -1)
+    }
+
+    const matchResult = match(path)
+
     if (!matchResult) {
+      const base = tenant !== "default" ? `/t/${tenant}` : ""
+      const fallback = base + "/"
+
+      if (location.pathname === fallback) {
+        console.error("Rota '/' não encontrada no config — verifique as rotas cadastradas")
+        return
+      }
+
       console.error(`Rota não encontrada: ${path}`)
 
       currentView = "404"
-
-      await render(
-        "404",
-        {},
-        {},
-        {
-          path
-        }
-      )
-
+      await render("404", {}, {}, { path })
       return
     }
-    
+
+    const { r, params } = matchResult
+    const user = getState().user
+
+    if (r.roles && !r.roles.includes(user?.role)) {
+      return navigate(withTenant("/login"))
+    }
+
+    document.title = r.title || "App"
+
+    const ctx = {
+      params,
+      query: getQueryParams()
+    }
+
+    const view = r.view
+    const routeKey = `${view}:${JSON.stringify(params)}:${location.search}`
+
+    // CORRIGIDO: compara com o valor antigo de currentView ANTES de sobrescrever.
+    // Se for exatamente a mesma rota+params+querystring de antes, só atualiza
+    // o conteúdo (sem refazer a view inteira / sem fade).
+    if (currentView === routeKey) {
+      return renderContentUI(view, config, r, { ...ctx, isUpdate: true })
+    }
+
+    currentView = routeKey
+
+    await render(view, r, params, ctx)
+
+  } finally {
+    routerLoading = false   // CORRIGIDO: sem isso o router só roda uma vez
+    hideLoader()
   }
-
-  const { r, params } = matchResult
-  const user = getState().user
-
-  if (r.roles && !r.roles.includes(user?.role)) {
-    return navigate(withTenant("/login"))
-  }
-
-  document.title = r.title || "App"
-
-  const ctx = {
-    params,
-    query: getQueryParams()
-  }
-
-  const view = r.view
-
-  const routeKey = `${view}:${JSON.stringify(params)}:${location.search}`
-
-  // if (currentView === routeKey) {
-  //   return renderContentUI(view, config, r, {
-  //     ...ctx,
-  //     isUpdate: true
-  //   })
-  // }
-
-  currentView = routeKey
-
-  if (currentView === view) {
-    return renderContentUI(view, config, r, { ...ctx, isUpdate: true })
-  }
-
-  currentView = view
-
-  await render(view, r, params, ctx)
-
-  
-
-  
-  // await render(view, r, params, ctx)
 }
+
+// export async function router() {
+
+//   if (routerLoading) return
+
+//   routerLoading = true
+  
+//   showLoader()
+
+//    try {
+
+//     if (!config || !config.routes) {
+//       console.error("Router chamado sem config válida")
+//       return
+//     }
+
+//     if (config.routes.length === 0) {
+//       console.error("Nenhuma rota configurada — abortando router para evitar loop")
+//       return
+//     }
+
+//     let path = location.pathname
+
+//     if (path.startsWith(`/t/${tenant}`)) {
+//       path = path.replace(`/t/${tenant}`, "") || "/"
+//     }
+
+//     // remove barra final
+//     if (path.length > 1 && path.endsWith("/")) {
+//       path = path.slice(0, -1)
+//     }
+
+//     const matchResult = match(path)
+
+//     if (!matchResult) {
+//       const base = tenant !== "default" ? `/t/${tenant}` : ""
+//       const fallback = base + "/"
+
+//       if (location.pathname === fallback) {
+//         console.error("Rota '/' não encontrada no config — verifique as rotas cadastradas")
+//         return
+//       }
+
+//       //return navigate(fallback)
+//       if (!matchResult) {
+//         console.error(`Rota não encontrada: ${path}`)
+
+//         currentView = "404"
+
+//         await render(
+//           "404",
+//           {},
+//           {},
+//           {
+//             path
+//           }
+//         )
+        
+//         return
+//       }
+
+//     }
+
+//     const { r, params } = matchResult
+//     const user = getState().user
+
+//     if (r.roles && !r.roles.includes(user?.role)) {
+//       return navigate(withTenant("/login"))
+//     }
+
+//     document.title = r.title || "App"
+
+//     const ctx = {
+//       params,
+//       query: getQueryParams()
+//     }
+
+//     const view = r.view
+
+//     const routeKey = `${view}:${JSON.stringify(params)}:${location.search}`
+
+//     // if (currentView === routeKey) {
+//     //   return renderContentUI(view, config, r, {
+//     //     ...ctx,
+//     //     isUpdate: true
+//     //   })
+//     // }
+
+//     currentView = routeKey
+
+//     if (currentView === view) {
+//       return renderContentUI(view, config, r, { ...ctx, isUpdate: true })
+//     }
+
+//     currentView = view
+
+//     await render(view, r, params, ctx)
+//   }
+//   finally {
+
+//       hideLoader()
+
+//   }
+  
+//   // await render(view, r, params, ctx)
+// }
 
 function mostrarToast(mensagem, posicao = "top-right", quem) {
 
@@ -646,6 +763,329 @@ function mostrarToast(mensagem, posicao = "top-right", quem) {
     toast.classList.remove("show");
     void toast.offsetWidth;
     toast.classList.add("show");
+}
+
+function injectLoaderCSS() {
+
+  if (document.getElementById("global-loader-style")) return
+
+  const style = document.createElement("style")
+
+  style.id = "global-loader-style"
+
+  style.textContent = `
+  
+  .loader-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.35);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:999999;
+      backdrop-filter:blur(2px);
+  }
+
+  .loader-container{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      color:#fff;
+      font-family:sans-serif;
+      font-size:14px;
+  }
+
+  .loader-spinner{
+      width:50px;
+      height:50px;
+      border:5px solid rgba(255,255,255,.3);
+      border-top:5px solid #fff;
+      border-radius:50%;
+      animation:loader-spin .8s linear infinite;
+  }
+
+  .loader-inline{
+      position:absolute;
+      inset:0;
+      background:rgba(255,255,255,.8);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:100;
+  }
+
+  @keyframes loader-spin{
+      from{
+          transform:rotate(0deg);
+      }
+      to{
+          transform:rotate(360deg);
+      }
+  }
+
+  .loader-overlay{
+    position:fixed;
+    inset:0;
+    z-index:999999;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:rgba(0,0,0,.35);
+
+    backdrop-filter:blur(4px);
+}
+
+.loader-inline{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:rgba(255,255,255,.75);
+
+    backdrop-filter:blur(2px);
+
+    z-index:100;
+}
+
+.loader-container{
+    width:260px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+}
+
+.loader-logo-wrapper{
+
+    position:relative;
+
+    width:110px;
+    height:110px;
+
+    overflow:hidden;
+}
+
+.loader-logo{
+
+    width:100%;
+    height:100%;
+
+    object-fit:contain;
+
+    animation:logoPulse 2s ease-in-out infinite;
+}
+
+.loader-logo-wrapper::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+    left:-150%;
+
+    width:50%;
+    height:100%;
+
+    transform:skewX(-20deg);
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.8),
+        transparent
+    );
+
+    animation:logoShine 1.8s infinite;
+  }
+
+  .loader-text{
+
+      font-size:14px;
+      font-weight:600;
+
+      color:#fff;
+
+      letter-spacing:.5px;
+  }
+
+  .loader-inline .loader-text{
+      color:#333;
+  }
+
+  .loader-progress{
+
+      width:220px;
+      height:4px;
+
+      overflow:hidden;
+
+      border-radius:999px;
+
+      background:rgba(255,255,255,.15);
+  }
+
+  .loader-inline .loader-progress{
+      background:rgba(0,0,0,.1);
+  }
+
+  .loader-progress-bar{
+
+      width:40%;
+      height:100%;
+
+      border-radius:999px;
+
+      background:white;
+
+      animation:loaderBar 1.2s linear infinite;
+  }
+
+  .loader-inline .loader-progress-bar{
+      background:#333;
+  }
+
+  @keyframes logoPulse{
+
+      0%{
+          transform:scale(.96);
+          opacity:.7;
+      }
+
+      50%{
+          transform:scale(1);
+          opacity:1;
+      }
+
+      100%{
+          transform:scale(.96);
+          opacity:.7;
+      }
+  }
+
+  @keyframes logoShine{
+
+      0%{
+          left:-150%;
+      }
+
+      100%{
+          left:200%;
+      }
+  }
+
+  @keyframes loaderBar{
+
+      0%{
+          transform:translateX(-250%);
+      }
+
+      100%{
+          transform:translateX(700%);
+      }
+  }
+
+  `
+
+  document.head.appendChild(style)
+}
+
+function showLoader(targetId = null) {
+
+  injectLoaderCSS()
+
+  const key = targetId || "__global__"
+
+  const count = activeLoaders.get(key) || 0
+
+  activeLoaders.set(key, count + 1)
+
+  if (count > 0) return
+
+  const loader = document.createElement("div")
+
+  loader.id = `loader-${key}`
+
+  if (!targetId) {
+
+    loader.className = "loader-overlay"
+
+  } else {
+
+    const parent = document.getElementById(targetId)
+
+    if (!parent) return
+
+    if (getComputedStyle(parent).position === "static") {
+      parent.style.position = "relative"
+    }
+
+    loader.className = "loader-inline"
+  }
+
+  const logoUrl = `${withTenant('logo.png')}`
+
+  loader.innerHTML = `
+    <div class="loader-container">
+
+        <div class="loader-logo-wrapper">
+            <img
+                class="loader-logo"
+                src="${logoUrl}"
+                onerror="this.src='/assets/logo.png'"
+            >
+        </div>
+
+        <div class="loader-text">
+            Aguarde...
+        </div>
+
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+
+    </div>
+    `
+
+  if (targetId) {
+    document.getElementById(targetId).appendChild(loader)
+  } else {
+    document.body.appendChild(loader)
+  }
+}
+
+function hideLoader(targetId = null) {
+
+  const key = targetId || "__global__"
+
+  const count = activeLoaders.get(key)
+
+  if (!count) return
+
+  if (count > 1) {
+    activeLoaders.set(key, count - 1)
+    return
+  }
+
+  activeLoaders.delete(key)
+
+  document.getElementById(`loader-${key}`)?.remove()
+}
+
+async function imageExists(url) {
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
 }
 
 // =====================================================

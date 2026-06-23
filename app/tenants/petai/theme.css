@@ -20,6 +20,8 @@ body{
   margin:auto;
 }
 
+a { text-decoration: none;}
+
 .bg-gradient{
   position:fixed;
   width:700px;
@@ -139,7 +141,8 @@ body{
 .badge{
   display:inline-flex;
   padding:10px 18px;
-  background:#eaffef;
+  /* background:#eaffef; */
+  background:#fff;
   border:1px solid #ccf7d7;
   color:var(--primary-dark);
   border-radius:999px;
@@ -588,3 +591,4 @@ body{
   }
 
 }
+

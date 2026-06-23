@@ -78,6 +78,7 @@ function importECDHPublicKey(server_pub) {
 
 function canonicalMessage(payload, tenantId) {
  // console.log("tenantId:", JSON.stringify(tenantId))
+ 
   return [
     payload.v,
     payload.timestamp,
@@ -101,12 +102,9 @@ function assertDefined(obj, keys) {
 }
 
 async function verifySignature(payload, publicKey, tenantId) {
+  
   assertDefined(payload, ["v", "timestamp", "server_pub", "iv", "ciphertext", "signature"])
 
-  // BUG CORRIGIDO: a versão anterior chamava buildMessage() (inexistente)
-  // E depois usava { name: "ECDSA" } em vez de { name: "RSA-PSS" }.
-  // Agora usa canonicalMessage() e RSA-PSS com saltLength: 32,
-  // espelhando exatamente o sign_response() do Python.
   const message = new TextEncoder().encode(canonicalMessage(payload, tenantId))
   const signatureBytes = base64ToBytes(payload.signature)
 
@@ -159,6 +157,17 @@ export async function decrypt_response(payload, clientKeys, tenantId) {
   if (!server_pub || !iv || !ciphertext || !signature || !v || !timestamp) {
     throw new Error("payload_incompleto")
   }
+
+// console.log("tenantId", tenantId)
+
+// console.log("server_pub", server_pub.length)
+// console.log("iv bytes", base64ToBytes(iv).length)
+// console.log("cipher bytes", base64ToBytes(ciphertext).length)
+
+// console.log(
+// "sharedSecret",
+// arrayBufferToBase64(sharedSecret)
+// )
 
   // =====================================================
   // 1. VERIFY SIGNATURE (RSA-PSS)
